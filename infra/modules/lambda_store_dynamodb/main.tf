@@ -5,8 +5,8 @@
 # se añade mediante 'filename'
 # También se pasa como variable de entorno la clave del secreto creado
 # en el módulo 'secrets_manager'
-resource "aws_lambda_function" "get_api_data_store_dynamodb" {
-  function_name                  = "get_api_data_store_dynamodb"
+resource "aws_lambda_function" "api_data_to_dynamodb" {
+  function_name                  = var.function_name
   role                           = var.role_lambda
   reserved_concurrent_executions = var.concurrency_lamba
   filename                       = var.lamba_path
@@ -14,7 +14,7 @@ resource "aws_lambda_function" "get_api_data_store_dynamodb" {
   handler                        = var.handler
   environment {
     variables = {
-      SECRET_NAME = aws_secretsmanager_secret.api_key_secret.name
+      SECRET_NAME = var.nombre_secreto
     }
   }
 }

@@ -1,3 +1,9 @@
+# Variable para configurar el nombre de la Lambda
+variable "function_name" {
+  type    = string
+  default = "api_data_to_dynamodb"
+}
+
 # Variable para configurar la concurrencia de la Lambda
 variable "concurrency_lamba" {
   type    = number
@@ -13,7 +19,7 @@ variable "role_lambda" {
 # Variable para almacenar la ruta del '.zip' de la Lambda
 variable "lamba_path" {
   type    = string
-  default = "./"
+  default = "src/api_data_to_dynamodb/lambda_function.zip"
 }
 
 # Variable para almacenar el 'runtime' de la Lambda
@@ -26,4 +32,11 @@ variable "runtime" {
 variable "handler" {
   type    = string
   default = "lambda_function.lambda_handler"
+}
+
+# Variable para almacenar el nombre del secreto almacenado
+# en AWS Secrets Manager (proviene del 'outputs.tf' del módulo 
+# 'secrets_manager')
+variable "nombre_secreto" {
+  type = string
 }

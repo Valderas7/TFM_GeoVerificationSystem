@@ -9,7 +9,9 @@ module "secrets" {
   openweather_api_key = var.openweather_api_key
 }
 
-# Se llama al módulo Lambda
-module "lambda" {
-  source = "./modules/lambda"
+# Se llama al módulo Lambda pasando el parámetro requerido 'nombre_secreto'
+# que referencia a 'secret_name' dentro del módulo 'secrets'
+module "lambda_store_dynamodb" {
+  source         = "./modules/lambda_store_dynamodb"
+  nombre_secreto = module.secrets.secret_name
 }
