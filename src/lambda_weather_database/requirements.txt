@@ -1,0 +1,2 @@
+boto3           # Incluida en AWS
+requests

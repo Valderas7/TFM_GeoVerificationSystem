@@ -1,7 +1,7 @@
 # Variable para configurar el nombre de la Lambda
 variable "function_name" {
   type    = string
-  default = "api_data_to_dynamodb"
+  default = "lambda_weather_database"
 }
 
 # Variable para configurar la concurrencia de la Lambda
@@ -19,7 +19,7 @@ variable "role_lambda" {
 # Variable para almacenar la ruta del '.zip' de la Lambda
 variable "lamba_path" {
   type    = string
-  default = "src/api_data_to_dynamodb/lambda_function.zip"
+  default = "resources/weather_dynamo_lambda.zip"
 }
 
 # Variable para almacenar el 'runtime' de la Lambda
@@ -34,9 +34,22 @@ variable "handler" {
   default = "lambda_function.lambda_handler"
 }
 
-# Variable para almacenar el nombre del secreto almacenado
-# en AWS Secrets Manager (proviene del 'outputs.tf' del módulo 
-# 'secrets_manager')
-variable "nombre_secreto" {
-  type = string
+# Variable para almacenar el nombre de la layer
+variable "layer_name" {
+  type    = string
+  default = "tfm_layer"
+
+}
+
+# Variable para almacenar la ruta del '.zip' de la layer
+variable "layer_path" {
+  type    = string
+  default = "resources/tfm_layer.zip"
+
+}
+
+# Variable para recopilar el valor de la API KEY de OpenWeatherMap
+variable "api_key" {
+  type      = string
+  sensitive = true
 }
