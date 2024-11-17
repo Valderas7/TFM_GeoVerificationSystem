@@ -34,17 +34,17 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: us-east-1
+    
+    # Paso 3: Cambiar al directorio de IaC
+    - name: Cambiar al directorio de IaC
+      run: |
+        cd infra
 
-    # Paso 3: Instalar Terraform
+    # Paso 4: Instalar Terraform
     - name: Instalar Terraform
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.9.8
-
-    # Paso 4: Cambiar al directorio de IaC
-    - name: Cambiar al directorio de IaC
-      run: |
-        cd infra
 
     # Paso 5: Inicializar Terraform
     - name: Inicializar Terraform
