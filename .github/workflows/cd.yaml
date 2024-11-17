@@ -50,9 +50,7 @@ jobs:
     # 'infra', guardando el plan en un archivo llamado 'tfplan'
     - name: Plan de Terraform
       working-directory: ./infra
-      env:
-          OPENWEATHER_API_KEY: ${{ secrets.API_KEY }}
-      run: terraform plan -out=tfplan
+      run: terraform plan -out=tfplan -var "openweather_api_key=${{ secrets.OPENWEATHER_API_KEY }}"
 
     # Paso 6: Aplicar el plan de Terraform si se aplica el 'commit' en
     # a la rama 'master'
