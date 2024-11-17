@@ -1,0 +1,57 @@
+# Nombre del flujo de trabajo:
+name: Despliegue Continuo
+
+# Este flujo de trabajo se activa...
+on:
+  
+  # Cuando se complete el flujo de trabajo 'Continuous Integration'
+  workflow_run:
+    workflows: ["Integración Continua"]
+    types:
+      - completed
+
+# Trabajos que se ejecutan en el flujo de trabajo
+jobs:
+
+  # Nombre del trabajo nº1: despliegue
+  despliegue:
+
+    # Se ejecuta en una máquina con Ubuntu
+    runs-on: ubuntu-latest
+
+    # Lista de pasos del trabajo
+    steps:
+
+    # Paso 1: Configuración del repositorio
+    - name: Checkout del repositorio
+      uses: actions/checkout@v3
+
+    # Paso 2: Configurar el acceso a AWS Academy
+    - name: Configurar credenciales de AWS
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: us-east-1
+
+    # Paso 3: Instalar Terraform
+    - name: Instalar Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.7
+
+    # Paso 4: Inicializar Terraform
+    - name: Inicializar Terraform
+      run: terraform init
+
+    # Paso 5: Genera el plan de ejecución de Terraform, guardando
+    # el plan en un archivo llamado 'tfplan'
+    - name: Plan de Terraform
+      run: terraform plan -out=tfplan
+
+    # Paso 6: Aplicar el plan de Terraform si se aplica el 'commit' en
+    # a la rama 'master'
+    - name: Aplicar el plan de Terraform
+      if: github.ref == 'refs/heads/master'
+      run: terraform apply -auto-approve tfplan

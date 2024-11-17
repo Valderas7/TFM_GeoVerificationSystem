@@ -16,10 +16,11 @@ variable "event_rule" {
   default = "event_cron"
 }
 
-# Variable para almacenar la ruta del '.zip' de la layer
+# Variable para almacenar expresión 'cron' para saber cuando se ejecuta
+# la Lambda (actualmente cada 2 horas)
 variable "schedule_expression" {
   type    = string
-  default = "cron(0 * * * ? *)"
+  default = "cron(0 */2 * * ? *)"
 
 }
 

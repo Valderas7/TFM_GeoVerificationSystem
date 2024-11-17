@@ -1,0 +1,47 @@
+# Nombre del flujo de trabajo:
+name: Integración Continua
+
+# Este flujo de trabajo se activa con los 'push' a la rama 'master'
+on:
+  push:
+    branches:
+      - master
+
+# Trabajos que se ejecutan en el flujo de trabajo
+jobs:
+
+  # Nombre del trabajo nº1: test
+  test:
+
+    # Se ejecuta en una máquina con Ubuntu
+    runs-on: ubuntu-latest
+
+    # Lista de pasos del trabajo
+    steps:
+
+    # Paso nº1: Acción 'checkout' para clonar el repositorio
+    - name: Clonar el repositorio
+      uses: actions/checkout@v3
+
+    # Paso nº2: Acción 'setup-python' para configurar Python 3.11
+    - name: Configurar Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    # Paso nº3: Actualizar 'pip' e instalar dependencias
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r src/lambda_weather_database/requirements.txt 
+
+    # Paso nº4: Ejecutar el linter Flake8
+    - name: Analizar código (linting)
+      run: |
+        pip install flake8
+        flake8 src 
+
+    # Paso nº5: Ejecutar los tests con Pytest
+    #- name: Ejecutar tests unitarios y de integración
+      #run: |
+        #pytest

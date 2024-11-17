@@ -4,11 +4,13 @@ resource "aws_lambda_layer_version" "tfm_layer" {
   filename   = var.layer_path
 }
 
-# Se crea un evento de 'EventBridge' que se ejecuta cada hora (a las hh:00)
-# todos los días, todos los meses y todos los días de la semana
+# Se crea un evento de 'EventBridge' que se ejecuta cada X tiempo
 resource "aws_cloudwatch_event_rule" "event_cron" {
   name = var.event_rule
   schedule_expression = var.schedule_expression
+  tags = {
+    "Project" = "TFM"
+  }
 }
 
 # Se crea una función Lambda para consultar la API de OpenWeather y almacenar
@@ -28,6 +30,9 @@ resource "aws_lambda_function" "lambda_weather_database" {
     variables = {
       API_KEY = var.api_key
     }
+  }
+  tags = {
+    "Project" = "TFM"
   }
 }
 
