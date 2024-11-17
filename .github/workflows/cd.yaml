@@ -41,15 +41,17 @@ jobs:
       with:
         terraform_version: 1.9.8
 
-    # Paso 4: Inicializar Terraform
+    # Paso 4: Inicializar Terraform en el directorio 'infra'
     - name: Inicializar Terraform
       working-directory: ./infra
       run: terraform init
 
-    # Paso 5: Generar el plan de ejecución de Terraform, guardando
-    # el plan en un archivo llamado 'tfplan'
+    # Paso 5: Generar el plan de ejecución de Terraform en el directorio
+    # 'infra', guardando el plan en un archivo llamado 'tfplan'
     - name: Plan de Terraform
       working-directory: ./infra
+      env:
+          OPENWEATHER_API_KEY: ${{ secrets.API_KEY }}
       run: terraform plan -out=tfplan
 
     # Paso 6: Aplicar el plan de Terraform si se aplica el 'commit' en
