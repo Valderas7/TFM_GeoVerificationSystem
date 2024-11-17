@@ -43,15 +43,18 @@ jobs:
 
     # Paso 4: Inicializar Terraform
     - name: Inicializar Terraform
-      run: terraform init -chdir=infra
+      working-directory: ./infra
+      run: terraform init
 
     # Paso 5: Generar el plan de ejecución de Terraform, guardando
     # el plan en un archivo llamado 'tfplan'
     - name: Plan de Terraform
+      working-directory: ./infra
       run: terraform plan -out=tfplan
 
     # Paso 6: Aplicar el plan de Terraform si se aplica el 'commit' en
     # a la rama 'master'
     - name: Aplicar el plan de Terraform
+      working-directory: ./infra
       if: github.ref == 'refs/heads/master'
       run: terraform apply -auto-approve tfplan
