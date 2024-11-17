@@ -10,8 +10,8 @@ on:
 # Trabajos que se ejecutan en el flujo de trabajo
 jobs:
 
-  # Nombre del trabajo nº1: test
-  test:
+  # Nombre del trabajo nº1: Test
+  Test:
 
     # Se ejecuta en una máquina con Ubuntu
     runs-on: ubuntu-latest
