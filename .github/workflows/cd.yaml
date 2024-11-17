@@ -34,28 +34,23 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: us-east-1
-    
-    # Paso 3: Cambiar al directorio de IaC
-    - name: Cambiar al directorio de IaC
-      run: |
-        cd infra
 
-    # Paso 4: Instalar Terraform
+    # Paso 3: Instalar Terraform
     - name: Instalar Terraform
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.9.8
 
-    # Paso 5: Inicializar Terraform
+    # Paso 4: Inicializar Terraform
     - name: Inicializar Terraform
-      run: terraform init
+      run: terraform init -chdir=infra
 
-    # Paso 6: Generar el plan de ejecución de Terraform, guardando
+    # Paso 5: Generar el plan de ejecución de Terraform, guardando
     # el plan en un archivo llamado 'tfplan'
     - name: Plan de Terraform
       run: terraform plan -out=tfplan
 
-    # Paso 7: Aplicar el plan de Terraform si se aplica el 'commit' en
+    # Paso 6: Aplicar el plan de Terraform si se aplica el 'commit' en
     # a la rama 'master'
     - name: Aplicar el plan de Terraform
       if: github.ref == 'refs/heads/master'
