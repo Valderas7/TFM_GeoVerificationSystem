@@ -2,10 +2,10 @@
 # un bucket de S3
 terraform {
   backend "s3" {
-    bucket         = var.s3_bucket_name
-    key            = var.tfstate_key_name
-    region         = var.aws_region
-    dynamodb_table = var.dynamodb_table_lock_state_name
+    bucket         = "tfm_bucket"
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-state-lock"
   }
 }
 
@@ -14,7 +14,7 @@ terraform {
 # ('state locking') del backend para evitar que múltiples ejecuciones de
 # Terraform modifiquen el estado simultáneamente
 resource "aws_dynamodb_table" "terraform_lock" {
-  name           = var.dynamodb_table_lock_state_name
+  name           = "terraform-state-lock"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "LockID"
 
