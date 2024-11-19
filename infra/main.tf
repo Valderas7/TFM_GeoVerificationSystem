@@ -1,10 +1,3 @@
-# Se llama al módulo 'backend' para crear los recursos (bucket y tabla
-# de DynamoDB) para almacenar el backend (archivo 'tfstate') en remoto
-module "remote_backend" {
-  source = "./modules/backend"
-}
-
-
 # Se llama al módulo 'lambda_weather_database' pasando el valor de la API KEY
 # (que está en 'var.openweather_api_key') a la variable 'api_key' del módulo
 # para crear la función Lambda que realiza consultas a la API de
