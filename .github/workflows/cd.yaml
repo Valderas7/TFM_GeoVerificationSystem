@@ -4,7 +4,7 @@ name: Despliegue Continuo
 # Este flujo de trabajo se activa...
 on:
   
-  # Cuando se complete el flujo de trabajo 'Continuous Integration'
+  # Cuando se complete el flujo de trabajo 'Integración Continua'
   workflow_run:
     workflows: ["Integración Continua"]
     types:
@@ -26,7 +26,8 @@ jobs:
     - name: Checkout del repositorio
       uses: actions/checkout@v3
 
-    # Paso 2: Configurar el acceso a AWS Academy
+    # Paso 2: Configurar el acceso a AWS Academy usando los secretos
+    # del repositorio con las credenciales de AWS
     - name: Configurar credenciales de AWS
       uses: aws-actions/configure-aws-credentials@v2
       with:
@@ -35,25 +36,28 @@ jobs:
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: us-east-1
 
-    # Paso 3: Instalar Terraform
+    # Paso 3: Instalar Terraform v1.9.8
     - name: Instalar Terraform
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.9.8
 
-    # Paso 4: Inicializar Terraform en el directorio 'infra'
+    # Paso 4: Inicializar Terraform en el directorio 'infra' (donde están los
+    # archivos de Terraform en el repositorio)
     - name: Inicializar Terraform
       working-directory: ./infra
       run: terraform init
 
     # Paso 5: Generar el plan de ejecución de Terraform en el directorio
-    # 'infra', guardando el plan en un archivo llamado 'tfplan'
+    # 'infra', guardando el plan en un archivo llamado 'tfplan' y pasando
+    # el valor de la 'API KEY' guardado como secreto en el repositorio del
+    # proyecto
     - name: Plan de Terraform
       working-directory: ./infra
-      run: terraform plan -out=tfplan -var "openweather_api_key=${{ secrets.OPENWEATHER_API_KEY }}"
+      run: terraform plan -out=tfplan -var "openweather_api_key=${{ secrets.API_KEY }}"
 
-    # Paso 6: Aplicar el plan de Terraform si se aplica el 'commit' en
-    # a la rama 'master'
+    # Paso 6: Aplicar el plan de Terraform guardado en 'tfplan' si se aplica
+    # el 'commit' en a la rama 'master'
     - name: Aplicar el plan de Terraform
       working-directory: ./infra
       if: github.ref == 'refs/heads/master'

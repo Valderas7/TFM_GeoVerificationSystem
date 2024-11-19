@@ -4,11 +4,13 @@ variable "layer_name" {
   default = "tfm_layer"
 }
 
+
 # Variable para almacenar la ruta del '.zip' de la layer
 variable "layer_path" {
   type    = string
   default = "resources/tfm_layer.zip"
 }
+
 
 # Variable para almacenar el nombre del evento de EventBridge
 variable "event_rule" {
@@ -16,13 +18,14 @@ variable "event_rule" {
   default = "event_cron"
 }
 
+
 # Variable para almacenar expresión 'cron' para saber cuando se ejecuta
 # la Lambda (actualmente cada 2 horas)
 variable "schedule_expression" {
   type    = string
   default = "cron(0 */2 * * ? *)"
-
 }
+
 
 # Variable para configurar el nombre de la Lambda
 variable "function_name" {
@@ -30,11 +33,13 @@ variable "function_name" {
   default = "lambda_weather_database"
 }
 
+
 # Variable para configurar la concurrencia de la Lambda
 variable "concurrency_lamba" {
   type    = number
   default = 1
 }
+
 
 # Variable para almacenar el ARN para el rol de la Lambda
 variable "role_lambda" {
@@ -42,11 +47,13 @@ variable "role_lambda" {
   default = "arn:aws:iam::637423493436:role/LabRole"
 }
 
+
 # Variable para almacenar la ruta del '.zip' de la Lambda
 variable "lamba_path" {
   type    = string
   default = "resources/weather_dynamo_lambda.zip"
 }
+
 
 # Variable para almacenar el 'runtime' de la Lambda
 variable "runtime" {
@@ -54,11 +61,13 @@ variable "runtime" {
   default = "python3.11"
 }
 
+
 # Variable para almacenar el 'handler' de la Lambda
 variable "handler" {
   type    = string
   default = "lambda_function.lambda_handler"
 }
+
 
 # Variable para recopilar el valor de la API KEY de OpenWeatherMap
 variable "api_key" {

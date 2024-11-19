@@ -4,14 +4,17 @@ resource "aws_lambda_layer_version" "tfm_layer" {
   filename   = var.layer_path
 }
 
+
 # Se crea un evento de 'EventBridge' que se ejecuta cada X tiempo
 resource "aws_cloudwatch_event_rule" "event_cron" {
   name = var.event_rule
   schedule_expression = var.schedule_expression
+
   tags = {
     "Project" = "TFM"
   }
 }
+
 
 # Se crea una función Lambda para consultar la API de OpenWeather y almacenar
 # los datos en una tabla de DynamoDB. Se especifica la ruta local del '.zip'
@@ -26,15 +29,18 @@ resource "aws_lambda_function" "lambda_weather_database" {
   runtime                        = var.runtime
   handler                        = var.handler
   layers                         = [aws_lambda_layer_version.tfm_layer.arn]
+
   environment {
     variables = {
       API_KEY = var.api_key
     }
   }
+
   tags = {
     "Project" = "TFM"
   }
 }
+
 
 # Se enlaza el evento de EventBridge con la función Lambda creada arriba (es
 # decir, el 'trigger')
@@ -42,6 +48,7 @@ resource "aws_cloudwatch_event_target" "trigger" {
   rule      = aws_cloudwatch_event_rule.event_cron.name
   arn       = aws_lambda_function.lambda_weather_database.arn
 }
+
 
 # Una vez se crea el 'trigger' se crea un permiso para que EventBridge tenga
 # los permisos necesarios para ejecutar la función Lambda

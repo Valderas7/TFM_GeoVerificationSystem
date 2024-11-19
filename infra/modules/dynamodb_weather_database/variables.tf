@@ -4,6 +4,7 @@ variable "table_name" {
     default = "Weather_DB"
 }
 
+
 # Variable para el método de facturación
 variable "billing_mode" {
     type = string
