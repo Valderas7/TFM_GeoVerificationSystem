@@ -7,7 +7,7 @@ resource "aws_lambda_layer_version" "tfm_layer" {
 
 # Se crea un evento de 'EventBridge' que se ejecuta cada X tiempo
 resource "aws_cloudwatch_event_rule" "event_cron" {
-  name = var.event_rule
+  name                = var.event_rule
   schedule_expression = var.schedule_expression
 
   tags = {
@@ -45,8 +45,8 @@ resource "aws_lambda_function" "lambda_weather_database" {
 # Se enlaza el evento de EventBridge con la función Lambda creada arriba (es
 # decir, el 'trigger')
 resource "aws_cloudwatch_event_target" "trigger" {
-  rule      = aws_cloudwatch_event_rule.event_cron.name
-  arn       = aws_lambda_function.lambda_weather_database.arn
+  rule = aws_cloudwatch_event_rule.event_cron.name
+  arn  = aws_lambda_function.lambda_weather_database.arn
 }
 
 

@@ -2,9 +2,9 @@
 # ('state locking') del backend para evitar que múltiples ejecuciones de
 # Terraform modifiquen el estado simultáneamente
 resource "aws_dynamodb_table" "terraform_lock" {
-  name           = var.backend_table
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "LockID"
+  name         = var.backend_table
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
 
   attribute {
     name = "LockID"

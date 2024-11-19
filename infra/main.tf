@@ -1,7 +1,7 @@
 # Se llama al módulo 'backend' para crear los recursos (bucket y tabla
 # de DynamoDB) para almacenar el backend (archivo 'tfstate') en remoto
-module "lambda_weather_database" {
-  source  = "./modules/backend"
+module "remote_backend" {
+  source = "./modules/backend"
 }
 
 
@@ -19,5 +19,5 @@ module "lambda_weather_database" {
 # DynamoDB en la que almacenar los datos de la API de OpenWeatherMap
 # consultados con la función Lambda
 module "dynamo_weather_database" {
-  source  = "./modules/dynamodb_weather_database"
+  source = "./modules/dynamodb_weather_database"
 }
