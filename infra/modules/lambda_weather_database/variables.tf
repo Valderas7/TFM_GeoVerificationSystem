@@ -69,6 +69,13 @@ variable "handler" {
 }
 
 
+# Variable para almacenar el 'timeout' en segundos de la Lambda
+variable "timeout" {
+  type    = number
+  default = 30
+}
+
+
 # Variable para recopilar el valor de la API KEY de OpenWeatherMap
 variable "api_key" {
   type      = string

@@ -3,6 +3,7 @@ import requests
 import boto3
 import os
 from botocore.exceptions import ClientError
+from decimal import Decimal
 from utils.spain_geography import get_provinces_and_autonomous_cities
 
 
@@ -103,3 +104,5 @@ def lambda_handler(event: None, context: None):
         except ClientError as e:
             print(f"Error al guardar los datos en DynamoDB: "
                   f"{e.response['Error']['Message']}")
+
+lambda_handler(None, None)
