@@ -48,8 +48,10 @@ resource "aws_lambda_function" "get_and_store_weather_data" {
 # Se enlaza el evento de EventBridge con la función Lambda creada arriba (es
 # decir, el 'trigger')
 resource "aws_cloudwatch_event_target" "trigger" {
-  rule = aws_cloudwatch_event_rule.event_cron.name
+  rule = var.event_rule
   arn  = aws_lambda_function.get_and_store_weather_data.arn
+
+  depends_on = [aws_cloudwatch_event_rule.event_cron]
 }
 
 
@@ -57,7 +59,7 @@ resource "aws_cloudwatch_event_target" "trigger" {
 # los permisos necesarios para ejecutar la función Lambda
 resource "aws_lambda_permission" "allow_eventbridge" {
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.get_and_store_weather_data.function_name
+  function_name = var.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.event_cron.arn
 }

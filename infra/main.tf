@@ -1,4 +1,4 @@
-# Se llama al módulo 'lambda_weather_database' pasando el valor de la API KEY
+# Llamada al módulo 'lambda_store_weather_data' pasando el valor de la API KEY
 # (que está en 'var.openweather_api_key') a la variable 'api_key' del módulo
 # para crear la función Lambda que realiza consultas a la API de
 # OpenWeatherMap y guarda los registros en una tabla de DynamoDB
