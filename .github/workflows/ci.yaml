@@ -33,7 +33,7 @@ jobs:
     - name: Instalar dependencias
       run: |
         python -m pip install --upgrade pip
-        pip install -r src/lambda_weather_database/requirements.txt 
+        pip install -r src/lambda_store_weather_data/requirements.txt 
 
     # Paso nº4: Ejecutar el linter Flake8
     - name: Analizar código (linting)
