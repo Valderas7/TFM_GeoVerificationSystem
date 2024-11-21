@@ -28,6 +28,8 @@ resource "aws_lambda_function" "get_and_store_weather_data" {
   role                           = var.role_lambda
   reserved_concurrent_executions = var.concurrency_lamba
   filename                       = var.lamba_path
+  source_code_hash               = filebase64sha256(var.lamba_path)
+  description                    = "Realiza solicitudes GET a OpenWeatherMap y guarda datos en DynamoDB"
   runtime                        = var.runtime
   handler                        = var.handler
   layers                         = [aws_lambda_layer_version.tfm_layer.arn]
