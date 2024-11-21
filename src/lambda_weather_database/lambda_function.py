@@ -66,8 +66,8 @@ def lambda_handler(event: None, context: None):
                     'Humidity': data["main"]["humidity"],
                     'Wind': data["wind"]["speed"],
                     'Cloudiness': data["clouds"]["all"],
-                    'Rain': data["rain"]["1h"] if "rain" in data else None,
-                    'Snow': data["snow"]["1h"] if "snow" in data else None,
+                    'Rain': data["rain"]["1h"] if "rain" in data else 0,
+                    'Snow': data["snow"]["1h"] if "snow" in data else 0,
                     'Latitude': data["coord"]["lat"],
                     'Longitude': data["coord"]["lon"]
                 }
@@ -116,30 +116,30 @@ def lambda_handler(event: None, context: None):
                             ),
                             ExpressionAttributeValues={
                                 ':val1': json.loads(
-                                    json.dumps(item['weather']),
+                                    json.dumps(item['Weather']),
                                     parse_float=Decimal
                                 ),
                                 ':val2': json.loads(
-                                    json.dumps(item['temperature']),
+                                    json.dumps(item['Temperature']),
                                     parse_float=Decimal
                                 ),
                                 ':val3': json.loads(
-                                    json.dumps(item['pressure']),
+                                    json.dumps(item['Pressure']),
                                     parse_float=Decimal
                                 ),
                                 ':val4': json.loads(
-                                    json.dumps(item['humidity']),
+                                    json.dumps(item['Humidity']),
                                     parse_float=Decimal
                                 ),
-                                ':val5': json.loads(json.dumps(item['wind']),
+                                ':val5': json.loads(json.dumps(item['Wind']),
                                                     parse_float=Decimal),
                                 ':val6': json.loads(
-                                    json.dumps(item['cloudiness']),
+                                    json.dumps(item['Cloudiness']),
                                     parse_float=Decimal
                                 ),
-                                ':val7': json.loads(json.dumps(item['rain']),
+                                ':val7': json.loads(json.dumps(item['Rain']),
                                                     parse_float=Decimal),
-                                ':val8': json.loads(json.dumps(item['snow']),
+                                ':val8': json.loads(json.dumps(item['Snow']),
                                                     parse_float=Decimal)
                             }
                         )
