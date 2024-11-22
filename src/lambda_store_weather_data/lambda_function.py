@@ -58,7 +58,6 @@ def lambda_handler(event: None, context: None):
                 # y nevadas.
                 # Además se almacena la longitud y latitud de cada sitio
                 item = {
-                    'Id': data["id"],
                     'Name': data["name"],
                     'Weather': data["weather"][0]["main"],
                     'Temperature': data["main"]["temp"],
@@ -83,7 +82,7 @@ def lambda_handler(event: None, context: None):
                     # Se comprueba si en la tabla ya hay un registro con la
                     # clave de de partición ('Id') de la provincia actual
                     response = dynamodb_table.get_item(
-                        Key={'Id': item["Id"]}
+                        Key={'Name': item["Name"]}
                     )
 
                     # Si no hay un registro en la tabla con esa clave de
@@ -93,7 +92,7 @@ def lambda_handler(event: None, context: None):
                         # Se añade el diccionario a la tabla de DynamoDB
                         dynamodb_table.put_item(
                             Item=item,
-                            ConditionExpression='attribute_not_exists(Id)'
+                            ConditionExpression='attribute_not_exists(Name)'
                         )
 
                     # Si no, ya hay registro con esa clave...
@@ -102,8 +101,8 @@ def lambda_handler(event: None, context: None):
                         # Por tanto, se actualizan los registros con los
                         # nuevos valores
                         dynamodb_table.update_item(
-                            Key={'Id': item["Id"]},
-                            ConditionExpression='attribute_exists(Id)',
+                            Key={'Name': item["Name"]},
+                            ConditionExpression='attribute_exists(Name)',
                             UpdateExpression=(
                                 "SET Weather = :val1, "
                                 "Temperature = :val2, "

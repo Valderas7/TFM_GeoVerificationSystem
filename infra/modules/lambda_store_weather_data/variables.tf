@@ -55,6 +55,13 @@ variable "lamba_path" {
 }
 
 
+# Variable para almacenar la descripción de la Lambda
+variable "lambda_description" {
+  type    = string
+  default = "Realiza solicitudes GET a OpenWeatherMap y guarda datos en DynamoDB"
+}
+
+
 # Variable para almacenar el 'runtime' de la Lambda
 variable "runtime" {
   type    = string

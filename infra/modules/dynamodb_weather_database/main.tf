@@ -4,11 +4,11 @@
 resource "aws_dynamodb_table" "weather_db" {
   name         = var.table_name
   billing_mode = var.billing_mode
-  hash_key     = "Id"
+  hash_key     = var.partition_key
 
   attribute {
-    name = "Id"
-    type = "N"
+    name = var.partition_key
+    type = "S"
   }
 
   tags = {

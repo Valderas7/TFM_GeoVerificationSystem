@@ -10,3 +10,10 @@ variable "billing_mode" {
   type    = string
   default = "PAY_PER_REQUEST"
 }
+
+
+# Variable para la clave de partición
+variable "partition_key" {
+  type    = string
+  default = "Name"
+}
