@@ -21,7 +21,6 @@ def lambda_handler(event: None, context: None):
 
         # Se obtiene el valor de la 'API KEY' pasado como variable de entorno
         api_key = os.getenv('API_KEY')
-        api_key = 'fd8c832d3847abbe1f5846f583d84ff3'
         logging.info("API_KEY cargada correctamente.")
 
         # Se llama a 'get_provinces_and_autonomous_cities' para obtener los
