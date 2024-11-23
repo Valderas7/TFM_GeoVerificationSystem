@@ -63,7 +63,7 @@ def lambda_handler(event: None, context: None):
                     'Nombre': data["name"],
                     'Clima': data["weather"][0]["main"],
                     'Temperatura': data["main"]["temp"],
-                    'Presión_Atmosférica': data["main"]["pressure"],
+                    'Presion_Atmosferica': data["main"]["pressure"],
                     'Humedad': data["main"]["humidity"],
                     'Velocidad_Viento': data["wind"]["speed"],
                     'Nubosidad': data["clouds"]["all"],
@@ -114,7 +114,7 @@ def lambda_handler(event: None, context: None):
                             UpdateExpression=(
                                 "SET Clima = :val1, "
                                 "Temperatura = :val2, "
-                                "Presión_Atmosférica = :val3, "
+                                "Presion_Atmosferica = :val3, "
                                 "Humedad = :val4, "
                                 "Velocidad_Viento = :val5, "
                                 "Nubosidad = :val6, "
@@ -124,7 +124,7 @@ def lambda_handler(event: None, context: None):
                             ExpressionAttributeValues={
                                 ':val1': item['Clima'],
                                 ':val2': item['Temperatura'],
-                                ':val3': item['Presión_Atmosférica'],
+                                ':val3': item['Presion_Atmosferica'],
                                 ':val4': item['Humedad'],
                                 ':val5': item['Velocidad_Viento'],
                                 ':val6': item['Nubosidad'],
