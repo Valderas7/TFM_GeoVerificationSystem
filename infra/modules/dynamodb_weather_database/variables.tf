@@ -15,5 +15,5 @@ variable "billing_mode" {
 # Variable para la clave de partición
 variable "partition_key" {
   type    = string
-  default = "Name"
+  default = "Nombre"
 }
