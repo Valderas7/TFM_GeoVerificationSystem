@@ -12,6 +12,10 @@ from utils.translate_dict_utils import translate_weather_dict
 # Configuración básica del 'logging'
 logging.basicConfig(level=logging.INFO)
 
+# Se inicia cliente de recursos de DynamoDB para gestionar una tabla
+dynamodb_resource = boto3.resource('dynamodb', region_name='us-east-1')
+dynamodb_table = dynamodb_resource.Table("Weather_DB")
+
 
 # Función Lambda
 def lambda_handler(event: None, context: None):
@@ -26,10 +30,6 @@ def lambda_handler(event: None, context: None):
         # Se llama a 'get_provinces_and_autonomous_cities' para obtener los
         # nombres de las provincias y ciudades autónomas de España
         spain_provinces_cities_list = get_provinces_and_autonomous_cities()
-
-        # Se inicia cliente de recursos de DynamoDB para gestionar una tabla
-        dynamodb_resource = boto3.resource('dynamodb', region_name='us-east-1')
-        dynamodb_table = dynamodb_resource.Table("Weather_DB")
 
         # Para cada una de las provincias y ciudades autónomas...
         for province in spain_provinces_cities_list:
