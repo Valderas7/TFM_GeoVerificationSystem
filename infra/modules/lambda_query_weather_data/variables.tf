@@ -22,7 +22,7 @@ variable "role_lambda" {
 # Variable para almacenar la ruta del '.zip' de la Lambda
 variable "lamba_path" {
   type    = string
-  default = "resources/.zip"
+  default = "resources/query_weather_data.zip"
 }
 
 
@@ -46,6 +46,12 @@ variable "handler" {
   default = "lambda_function.lambda_handler"
 }
 
+
+# Variable para almacenar el ARN de la 'layer' a usar
+variable "layer" {
+  type        = string
+  description = "ARN de la 'layer' a usar para la Lambda"
+}
 
 # Variable para almacenar el 'timeout' en segundos de la Lambda
 variable "timeout" {

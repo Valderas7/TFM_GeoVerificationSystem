@@ -1,3 +1,17 @@
+# Variable para almacenar el nombre de la layer
+variable "layer_name" {
+  type    = string
+  default = "tfm_layer"
+}
+
+
+# Variable para almacenar la ruta del '.zip' de la layer
+variable "layer_path" {
+  type    = string
+  default = "resources/tfm_layer.zip"
+}
+
+
 # Variable para almacenar la región de AWS
 variable "aws_region" {
   type    = string

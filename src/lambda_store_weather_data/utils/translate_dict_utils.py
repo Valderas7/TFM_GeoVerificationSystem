@@ -1,5 +1,5 @@
-# Función para transformar los valores de la clave 'weather' del diccionario
-# obtenido tras consultar la API de OpenWeatherMap
+# Función para transformar los valores de la clave 'Clima' y 'Nombre' del
+# diccionario obtenido tras consultar la API de OpenWeatherMap
 def translate_weather_dict(api_dict: dict) -> dict:
 
     # Diccionario de mapeo para valores de clima
@@ -20,6 +20,17 @@ def translate_weather_dict(api_dict: dict) -> dict:
         'Thunderstorm': 'Tormenta_Eléctrica'
     }
 
+    # Diccionario de mapeo para valores de provincias
+    mapeo_name = {
+        'Araba / Álava': 'Álava',
+        'Balearic Islands': 'Islas Baleares',
+        'Biscay': 'Vizcaya',
+        'Navarre': 'Navarra',
+        'Principality of Asturias': 'Asturias',
+        'Province of Huelva': 'Huelva',
+        'Seville': 'Sevilla'
+    }
+
     # Se verifica si la clave 'Clima' existe en 'api_dict' y si el valor
     # de dicha clave aparece en el diccionario de mapeo
     if 'Clima' in api_dict and api_dict['Clima'] in mapeo_weather:
@@ -27,5 +38,12 @@ def translate_weather_dict(api_dict: dict) -> dict:
         # Se cambia el valor de la clave 'Clima' usando el mapeo
         api_dict['Clima'] = mapeo_weather[api_dict['Clima']]
 
-        # Se devuelve el diccionario con los nuevos valores de 'Clima'
-        return api_dict
+    # Se verifica si la clave 'Nombre' existe en 'api_dict' y si el valor
+    # de dicha clave aparece en el diccionario de mapeo
+    if 'Nombre' in api_dict and api_dict['Nombre'] in mapeo_name:
+
+        # Se cambia el valor de la clave 'Nombre' usando el mapeo
+        api_dict['Nombre'] = mapeo_name[api_dict['Nombre']]
+
+    # Se devuelve el diccionario con los nuevos valores de 'Nombre' y 'Clima'
+    return api_dict

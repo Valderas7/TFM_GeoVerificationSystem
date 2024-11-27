@@ -1,17 +1,3 @@
-# Variable para almacenar el nombre de la layer
-variable "layer_name" {
-  type    = string
-  default = "tfm_layer"
-}
-
-
-# Variable para almacenar la ruta del '.zip' de la layer
-variable "layer_path" {
-  type    = string
-  default = "resources/tfm_layer.zip"
-}
-
-
 # Variable para almacenar el nombre del evento de EventBridge
 variable "event_rule" {
   type    = string
@@ -73,6 +59,13 @@ variable "runtime" {
 variable "handler" {
   type    = string
   default = "lambda_function.lambda_handler"
+}
+
+
+# Variable para almacenar el ARN de la 'layer' a usar
+variable "layer" {
+  type        = string
+  description = "ARN de la 'layer' a usar para la Lambda"
 }
 
 
