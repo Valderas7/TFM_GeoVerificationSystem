@@ -4,11 +4,13 @@ name: Despliegue Continuo
 # Este flujo de trabajo se activa...
 on:
   
-  # Cuando se complete el flujo de trabajo 'Integración Continua'
+  # Cuando se complete el flujo de trabajo 'Integración Continua' de forma
+  # satisfactoria
   workflow_run:
     workflows: ["Integración Continua"]
     types:
       - completed
+    status: success
 
 # Trabajos que se ejecutan en el flujo de trabajo
 jobs:
