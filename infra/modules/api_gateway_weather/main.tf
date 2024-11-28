@@ -90,9 +90,16 @@ resource "aws_api_gateway_integration" "clima_provincia_get_integration" {
 # declaradas en este archivo
 resource "aws_api_gateway_deployment" "clima_api_gateway_deployment" {
   rest_api_id = aws_api_gateway_rest_api.clima_api_gateway.id
-  stage_name  = var.stage
   depends_on = [
     aws_api_gateway_integration.clima_get_integration,
-    aws_api_gateway_method.clima_provincia_get
+    aws_api_gateway_integration.clima_provincia_get_integration
   ]
+}
+
+
+# Se configura un 'stage' para realizar el despliegue de la API
+resource "aws_api_gateway_stage" "stage" {
+  rest_api_id = aws_api_gateway_rest_api.clima_api_gateway.id
+  stage_name = var.stage
+  deployment_id = aws_api_gateway_deployment.clima_api_gateway_deployment.id
 }
