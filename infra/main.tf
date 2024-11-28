@@ -21,10 +21,13 @@ module "dynamo_weather_database" {
 # Se llama al módulo 'lambda_query_weather_data' para realizar las consultas
 # de datos climáticos almacenados en DynamoDB cada vez que se invocan
 # recursos de API Gateway pasando el valor del ARN de la 'layer' a la variable
-# 'layer' del módulo
+# 'layer' del módulo y también el output 'api_arn' del módulo
+# 'api_gateway_weather' a la variable 'api_arn' del módulo para que tenga el
+# URI de ejecución de la API Gateway
 module "lambda_query_weather_data" {
   source = "./modules/lambda_query_weather_data"
   layer  = aws_lambda_layer_version.tfm_layer.arn
+  api_arn = module.api_gateway_weather.api_arn
 }
 
 

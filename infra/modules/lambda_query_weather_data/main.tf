@@ -18,3 +18,14 @@ resource "aws_lambda_function" "query_weather_data" {
     "Project" = "TFM"
   }
 }
+
+
+# Se crea un permiso para que API Gateway pueda ejecutar esta función Lambda,
+# indicando que tiene permisos de ejecución en la raíz de la API y en los
+# recursos y subrecursos posteriores ('/clima' y '/clima/{provincia}')
+resource "aws_lambda_permission" "allow_api_gateway" {
+  action        = "lambda:InvokeFunction"
+  function_name = var.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${var.api_arn}/*/*"
+}
