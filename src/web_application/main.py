@@ -1,8 +1,7 @@
 # Librerías
-import leafmap.leafmap as leafmap
 import streamlit as st
 import requests
-import ipywidgets as widgets
+import leafmap.foliumap as leafmap
 
 # Se guarda en una variable la URL de la API Gateway desplegada con AWS
 api_gateway_url = 'https://mjb5qk45si.execute-api.us-east-1.amazonaws.com/prod'
@@ -17,42 +16,29 @@ action = st.sidebar.radio("Elige una opción:",
 # Si se elige la opción 'Ver mapa general'
 if action == "Ver mapa general":
 
-    # Título de la aplicación 
-    st.title("Mapa del clima en España")
+    # Título de la Web App con cabecera H2
+    st.markdown("<h2 style='text-align: center; color: black;'> Clima actual en España </h2>",
+                unsafe_allow_html=True)
     
-    # Se realiza petición GET a la API Gateway en /clima
-    response = requests.get(f"{api_gateway_url}/clima").json()
+    # Descripción de lo que realiza la aplicación web
+    st.write('''En esta aplicación se realiza una monitorización y una vista actual del clima
+             actual de todas las provincias y ciudades autónomas de España.''')
 
-    # Se entra dentro de la clave 'data' que es donde está la lista con todos
-    # los JSON de respuesta
-    response_list = response['data']
+    st.markdown("- La cámara se muestra en tiempo real por la pantalla hasta que se pulsa el botón `Take Photo`, momento en el "
+                "que se pasa a procesar el fotograma elegido con el modelo de detección de trofozoítos.")
+    st.markdown("- Si se pulsa el botón `Clear Photo` se elimina el fotograma procesado y se vuelve a mostrar por pantalla la "
+                "cámara en tiempo real.")
 
-    # Crear mapa con Leafmap con centro en España y zoom adecuado
-    m = leafmap.Map(center=[40.0, -3.0], zoom=6)
+    # Se crea un mapa centrado en Madrid
+    m = leafmap.Map(center=(40.4168, -3.7038), zoom=6)
 
-    # Para cada diccionario de la lista...        
-    for provincia_dict in response_list:
-        
-        # Se añade un marcador al mapa de Leafmap con los campos de latitud
-        # longitud de la provincia
-        popup_content=(
-            f"Provincia: {provincia_dict['Nombre']}<br>"
-            f"Clima: {provincia_dict['Clima']}<br>"
-            f"Temperatura: {provincia_dict['Temperatura']} °C<br>"
-            f"Humedad: {provincia_dict['Humedad']}%"
-        )
+    # Agregar marcadores básicos con coordenadas y descripciones
+    m.add_marker(location=(40.4168, -3.7038), popup="Madrid: Capital de España")
+    m.add_marker(location=(41.3879, 2.16992), popup="Barcelona: Ciudad cosmopolita")
+    m.add_marker(location=(37.3891, -5.9845), popup="Sevilla: Famosa por su cultura y arte")
 
-        # Crear un widget HTML para el popup
-        popup = widgets.HTML(value=popup_content)
-
-        # Añadir el marcador con el popup al mapa
-        m.add_marker(
-            location=(provincia_dict["Latitud"], provincia_dict["Longitud"]),
-            popup=popup
-        )
-    
-    # Renderiza el mapa en Streamlit
-    m.to_streamlit()
+    # Mostrar el mapa en la app de Streamlit
+    m.to_streamlit(height=600)
 
 # Si se elige la opción de consultar los datos de una provincia específica...
 elif action == "Consultar provincia específica":
