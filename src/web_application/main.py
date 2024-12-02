@@ -12,8 +12,7 @@ api_gateway_url = 'https://mjb5qk45si.execute-api.us-east-1.amazonaws.com/prod'
 st.sidebar.title("Opciones")
 action = st.sidebar.radio("Elige una opción:", 
                           options=["Situación meteorológica actual",
-                                   "Consultar provincia específica",
-                                   "Estadísticas"])
+                                   "Consultar provincia específica"])
 
 # Si se elige la opción 'Ver mapa general'
 if action == "Situación meteorológica actual":
@@ -137,21 +136,59 @@ if action == "Situación meteorológica actual":
     # Renderiza el mapa en Streamlit
     m.to_streamlit()
 
-# Si se elige la opción de consultar los datos de una provincia específica...
-elif action == "Consultar provincia específica":
-    st.title("Consulta el clima de una provincia")
-    provincia = st.sidebar.text_input("Nombre de la provincia:")
-    if st.sidebar.button("Consultar"):
-        response = requests.get(f"{api_gateway_url}/clima/{provincia}")
-        if response.status_code == 200:
-            data = response.json()
-            st.write(f"**Clima en {data['Nombre']}:**")
-            st.json(data)
-        else:
-            st.error("No se encontró la provincia. Intenta de nuevo.")
+# Si se elige la opción 'Consultar provincia específica'...
+if action == "Consultar provincia específica":
 
-elif action == "Estadísticas":
-    st.title("Estadísticas generales")
-    response = requests.get(f"{api_gateway_url}/clima").json()
-    temperaturas = [float(p["Temperatura"]) for p in response]
-    st.metric("Temperatura promedio", f"{sum(temperaturas) / len(temperaturas):.2f} °C")
+    # Título de la aplicación
+    st.markdown("<h2 style='text-align: center; color: black;'> Consulta por Provincia </h2>", unsafe_allow_html=True)
+
+    # Se introduce un 'widget' de texto de entrada
+    provincia = st.text_input("Introduce el nombre de la provincia:")
+
+    # Cuando se introduce una provincia...
+    if provincia:
+
+        # Se hace una solicitud GET a la API Gateway en '/clima/{provincia}'
+        response = requests.get(f"{api_gateway_url}/clima/{provincia}")
+
+        # Si la respuesta es satisfactoria...
+        if response.status_code == 200:
+
+            # Se almacena la respuesta JSON
+            data = response.json()
+
+            # Si la respuesta JSON existe...
+            if data:
+
+                # Se muestra el JSON de la respuesta en la aplicación web
+                st.json(data)
+
+                # Se recopilan los valores de latitud y longitud de la
+                # provincia
+                lat, lon = float(data['Latitud']), float(data['Longitud'])
+
+                # Se crea un mapa centrado en los valores de latitud y
+                # longitud de la provincia
+                map_provincia = leafmap.Map(center=(lat, lon), zoom=8)
+
+                # Se crea un 'popup' 
+                popup = folium.Popup(f"{provincia.capitalize()}<br>{data}")
+
+                # Se añade el marcador de la provincia al mapa con el 'popup'
+                # creado
+                map_provincia.add_marker(location=(lat, lon), popup=popup)
+
+                # Se renderiza el mapa de la provincia en Streamlit
+                map_provincia.to_streamlit()
+            
+            # Si la respuesta JSON no existe...
+            else:
+
+                # Mensaje de 'warning' en Streamlit
+                st.warning("No se encontraron datos para la provincia especificada.")
+        
+        # Si la respuesta de la solicitud GET no es satisfactoria...
+        else:
+
+            # Mensaje de error en Streamlit
+            st.error("Error al obtener los datos. Verifica el nombre de la provincia.")
