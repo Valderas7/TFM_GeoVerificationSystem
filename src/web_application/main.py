@@ -3,7 +3,7 @@ import streamlit as st
 import requests
 import leafmap.foliumap as leafmap
 import folium
-from unidecode import unidecode
+from utils.html_entities import convert_to_html_entities
 
 # Se guarda en una variable la URL de la API Gateway desplegada con AWS
 api_gateway_url = 'https://mjb5qk45si.execute-api.us-east-1.amazonaws.com/prod'
@@ -97,9 +97,11 @@ if action == "Ver mapa general":
             st.warning(f"Coordenadas faltantes para {provincia_dict['Nombre']}")
             continue
 
-        # Se crea un contenido 'popup'
+        # Se crea un contenido 'popup' con el nombre de la provincia,
+        # sustituyendo las 'ñ' y las tildes por sus códigos numéricos HTML, ya
+        # que si no, no se muestran correctamente
         popup_content = (
-            f"Provincia: {unidecode(provincia_dict['Nombre'])}<br>"
+            f"Provincia: {convert_to_html_entities(provincia_dict['Nombre'])}<br>"
             f"Clima: {provincia_dict['Clima']}<br>"
             f"Temperatura: {provincia_dict['Temperatura']} &#176;C<br>"
             f"Humedad: {provincia_dict['Humedad']}%"
