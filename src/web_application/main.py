@@ -11,25 +11,29 @@ api_gateway_url = 'https://mjb5qk45si.execute-api.us-east-1.amazonaws.com/prod'
 # Barra lateral para mostrar las opciones disponibles
 st.sidebar.title("Opciones")
 action = st.sidebar.radio("Elige una opción:", 
-                          options=["Ver mapa general",
+                          options=["Situación meteorológica actual",
                                    "Consultar provincia específica",
                                    "Estadísticas"])
 
 # Si se elige la opción 'Ver mapa general'
-if action == "Ver mapa general":
+if action == "Situación meteorológica actual":
 
     # Título de la Web App con cabecera H2
-    st.markdown("<h2 style='text-align: center; color: black;'> Clima Actual en España </h2>",
+    st.markdown("<h2 style='text-align: center; color: black;'> Visualizador "
+                "Interactivo de Datos Climáticos de España </h2>",
                 unsafe_allow_html=True)
     
     # Descripción de lo que realiza la aplicación web
-    st.write('''En esta aplicación se realiza una monitorización y una vista actual del clima
-             actual de todas las provincias y ciudades autónomas de España.''')
-
-    st.markdown("- La cámara se muestra en tiempo real por la pantalla hasta que se pulsa el botón `Take Photo`, momento en el "
-                "que se pasa a procesar el fotograma elegido con el modelo de detección de trofozoítos.")
-    st.markdown("- Si se pulsa el botón `Clear Photo` se elimina el fotograma procesado y se vuelve a mostrar por pantalla la "
-                "cámara en tiempo real.")
+    st.markdown("Consulta información climática actualizada de cada "
+                "provincia de España de forma visual y dinámica. Este mapa "
+                "interactivo muestra datos como el clima, la temperatura y "
+                "la humedad, utilizando marcadores informativos para cada "
+                "ubicación.")
+    
+    st.markdown("Para ver la información de una provincia basta con "
+                "hacer `click` en cualquier marcador del mapa para mostrar "
+                "el `popup` con toda la información meteorológica actual "
+                "correspondiente a dicha provincia.")
 
     # Se crea un mapa centrado en Madrid
     m = leafmap.Map(center=(40.4168, -3.7038), zoom=6)
@@ -103,7 +107,7 @@ if action == "Ver mapa general":
         # clima, temperatura, etc.
         popup_content = (
             f"Provincia: {convert_to_html_entities(provincia_dict['Nombre'])}<br>"
-            f"Clima: {provincia_dict['Clima']}<br>"
+            f"Clima: {convert_to_html_entities(provincia_dict['Clima'])}<br>"
             f"Temperatura: {provincia_dict['Temperatura']} &#176;C<br>"
             f"Humedad: {provincia_dict['Humedad']}%"
         )

@@ -68,12 +68,13 @@ def lambda_handler(event, context):
                 }
 
             # Se devuelve un diccionario con el código de estado HTTP 200 y
-            # el JSON
+            # el JSON, sin escapar los caracteres no ASCII (tildes, etc)
             logging.info(f"Provincia '{place}' encontrada en DynamoDB. "
                          "Retornando datos.")
             return {
                 'statusCode': 200,
-                'body': json.dumps(item, cls=DecimalEncoder)
+                'body': json.dumps(item, cls=DecimalEncoder,
+                                   ensure_ascii=False)
             }
 
         # Si en cambio es None, el método es 'GET /clima'
