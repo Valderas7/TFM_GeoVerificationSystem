@@ -102,20 +102,36 @@ if action == "Situación meteorológica actual":
             continue
 
         # Se crea un contenido 'popup' con el nombre de la provincia,
-        # sustituyendo las 'ñ' y las tildes por sus códigos numéricos HTML con
-        # la función 'convert_to_html_entities'; además de los demás datos de
-        # clima, temperatura, etc.
+        # además de los demás datos de clima, temperatura, etc, sustituyendo
+        # las 'ñ' y las tildes por sus códigos numéricos HTML con la
+        # función 'convert_to_html_entities'
         popup_content = (
             f"Provincia: {convert_to_html_entities(provincia_dict['Nombre'])}<br>"
             f"Clima: {convert_to_html_entities(provincia_dict['Clima'])}<br>"
             f"Temperatura: {provincia_dict['Temperatura']} &#176;C<br>"
-            f"Humedad: {provincia_dict['Humedad']}%"
+            f"Humedad: {provincia_dict['Humedad']} %<br>"
+            f"Nubosidad: {provincia_dict['Nubosidad']} %<br>"
+            f"{convert_to_html_entities('Presión Atm')}: {provincia_dict['Presion_Atmosferica']} hPa<br>"
+            f"Viento: {provincia_dict['Velocidad_Viento']} m/s<br>"
         )
+
+        # Si las precipitaciones del diccionario son mayores de 0 mm/h...
+        if float(provincia_dict['Precipitaciones']) > 0.0:
+
+            # Se agregan las precipitaciones al 'popup'
+            popup_content += f"Precipitaciones: {provincia_dict['Precipitaciones']} mm/h<br>"
+
+        # Si las nevadas del diccionario son mayores de 0 mm/h...
+        if float(provincia_dict['Nevadas']) > 0.0:
+
+            # Se agregan las nevadas al 'popup'
+            popup_content += f"Nevadas: {provincia_dict['Nevadas']} mm/h<br>"
         
-        # Se crea el popup con el contenido y se especifica su ancho máximo
+        # Se crea un 'popup' con el contenido y se especifica su ancho máximo
         popup = folium.Popup(popup_content, max_width=400)
 
-        # Añadir el marcador con el icono y el popup al mapa
+        # Añadir el marcador en la localización indicada con el 'popup' de la
+        # información meteorológica
         m.add_marker(location=([lat, lon]), popup=popup)
     
     # Renderiza el mapa en Streamlit
