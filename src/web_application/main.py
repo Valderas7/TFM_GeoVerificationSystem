@@ -98,8 +98,9 @@ if action == "Ver mapa general":
             continue
 
         # Se crea un contenido 'popup' con el nombre de la provincia,
-        # sustituyendo las 'ñ' y las tildes por sus códigos numéricos HTML, ya
-        # que si no, no se muestran correctamente
+        # sustituyendo las 'ñ' y las tildes por sus códigos numéricos HTML con
+        # la función 'convert_to_html_entities'; además de los demás datos de
+        # clima, temperatura, etc.
         popup_content = (
             f"Provincia: {convert_to_html_entities(provincia_dict['Nombre'])}<br>"
             f"Clima: {provincia_dict['Clima']}<br>"

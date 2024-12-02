@@ -1,35 +1,48 @@
+# Diccionario de mapeo para valores de clima
+mapeo_weather = {
+    'Ash': 'Ceniza_Volcánica',
+    'Clear': 'Despejado',
+    'Clouds': 'Nublado',
+    'Drizzle': 'Llovizna',
+    'Dust': 'Tormenta_Polvo',
+    'Fog': 'Niebla',
+    'Haze': 'Calima',
+    'Mist': 'Neblina',
+    'Rain': 'Lluvioso',
+    'Sand': 'Tormenta_Arena',
+    'Smoke': 'Humareda',
+    'Snow': 'Nevado',
+    'Squall': 'Turbonada',
+    'Thunderstorm': 'Tormenta_Eléctrica'
+}
+
+# Diccionario de mapeo para valores de provincias
+mapeo_name = {
+    'A Coruña': 'La Coruña',
+    'Almeria': 'Almería',
+    'Araba / Álava': 'Álava',
+    'Balearic Islands': 'Islas Baleares',
+    'Biscay': 'Vizcaya',
+    'Caceres': 'Cáceres',
+    'Cadiz': 'Cádiz',
+    'Castellon': 'Castellón',
+    'Cordoba': 'Córdoba',
+    'Girona': 'Gerona',
+    'Gipuzkoa': 'Guipúzcoa',
+    'Jaen': 'Jaén',
+    'Leon': 'León',
+    'Lleida': 'Lérida',
+    'Navarre': 'Navarra',
+    'Ourense': 'Orense',
+    'Principality of Asturias': 'Asturias',
+    'Province of Huelva': 'Huelva',
+    'Seville': 'Sevilla'
+}
+
+
 # Función para transformar los valores de la clave 'Clima' y 'Nombre' del
 # diccionario obtenido tras consultar la API de OpenWeatherMap
 def translate_weather_dict(api_dict: dict) -> dict:
-
-    # Diccionario de mapeo para valores de clima
-    mapeo_weather = {
-        'Ash': 'Ceniza_Volcánica',
-        'Clear': 'Despejado',
-        'Clouds': 'Nublado',
-        'Drizzle': 'Llovizna',
-        'Dust': 'Tormenta_Polvo',
-        'Fog': 'Niebla',
-        'Haze': 'Calima',
-        'Mist': 'Neblina',
-        'Rain': 'Lluvioso',
-        'Sand': 'Tormenta_Arena',
-        'Smoke': 'Humareda',
-        'Snow': 'Nevado',
-        'Squall': 'Turbonada',
-        'Thunderstorm': 'Tormenta_Eléctrica'
-    }
-
-    # Diccionario de mapeo para valores de provincias
-    mapeo_name = {
-        'Araba / Álava': 'Álava',
-        'Balearic Islands': 'Islas Baleares',
-        'Biscay': 'Vizcaya',
-        'Navarre': 'Navarra',
-        'Principality of Asturias': 'Asturias',
-        'Province of Huelva': 'Huelva',
-        'Seville': 'Sevilla'
-    }
 
     # Se verifica si la clave 'Clima' existe en 'api_dict' y si el valor
     # de dicha clave aparece en el diccionario de mapeo
