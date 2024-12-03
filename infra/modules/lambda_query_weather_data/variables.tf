@@ -63,6 +63,6 @@ variable "timeout" {
 # Variable para almacenar el ARN de ejecución de la API Gateway para
 # darle permisos de ejecución de la Lambda
 variable "api_arn" {
-  type    = string
+  type        = string
   description = "ARN de ejecución de la API Gateway"
 }

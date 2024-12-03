@@ -25,8 +25,8 @@ module "dynamo_weather_database" {
 # 'api_gateway_weather' a la variable 'api_arn' del módulo para que tenga el
 # URI de ejecución de la API Gateway
 module "lambda_query_weather_data" {
-  source = "./modules/lambda_query_weather_data"
-  layer  = aws_lambda_layer_version.tfm_layer.arn
+  source  = "./modules/lambda_query_weather_data"
+  layer   = aws_lambda_layer_version.tfm_layer.arn
   api_arn = module.api_gateway_weather.api_arn
 }
 

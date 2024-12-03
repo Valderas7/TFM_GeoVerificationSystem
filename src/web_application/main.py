@@ -192,3 +192,31 @@ if action == "Consultar provincia específica":
 
             # Mensaje de error en Streamlit
             st.error("Error al obtener los datos. Verifica el nombre de la provincia.")
+
+if action == "Estadísticas":
+    st.markdown("<h2 style='text-align: center; color: black;'> Estadísticas Generales </h2>", unsafe_allow_html=True)
+
+    # Realiza la petición a /clima
+    response = requests.get(f"{api_gateway_url}/clima").json()
+    if 'data' in response:
+        response_list = response['data']
+        # Extraer datos para las estadísticas
+        temperaturas = [float(prov['Temperatura']) for prov in response_list]
+        humedad = [float(prov['Humedad']) for prov in response_list]
+        provincias = [prov['Nombre'] for prov in response_list]
+
+        # Mostrar gráficos
+        st.bar_chart({"Provincias": provincias, "Temperatura": temperaturas})
+        st.line_chart({"Provincias": provincias, "Humedad": humedad})
+
+        # Mostrar máximos y mínimos
+        max_temp = max(response_list, key=lambda x: float(x['Temperatura']))
+        min_temp = min(response_list, key=lambda x: float(x['Temperatura']))
+        st.write(f"Provincia más cálida: {max_temp['Nombre']} ({max_temp['Temperatura']} °C)")
+        st.write(f"Provincia más fría: {min_temp['Nombre']} ({min_temp['Temperatura']} °C)")
+    else:
+        st.error("No se pudo obtener datos para estadísticas.")
+
+if action == "Descargar datos":
+    st.download_button("Descargar datos", data=str(response), file_name="datos_climaticos.csv")
+

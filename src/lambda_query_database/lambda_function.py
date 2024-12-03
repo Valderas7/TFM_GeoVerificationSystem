@@ -2,6 +2,7 @@
 import boto3
 import decimal
 import json
+import urllib.parse
 import logging
 
 # Configuración básica del 'logging'
@@ -36,7 +37,7 @@ def lambda_handler(event, context):
     try:
 
         # Se verifica si el evento contiene un parámetro de ruta 'provincia'.
-        # Si lo hay obtiene su valor; y si no lo hay, la variable vale 'None'
+        # Si lo hay, obtiene su valor; y si no lo hay, la variable vale 'None'
         place = (
             event.get('pathParameters', {}).get('provincia', None)
             if event.get('pathParameters') else None
@@ -45,6 +46,12 @@ def lambda_handler(event, context):
         # Si el parámetro de ruta 'provincia' existe, el método es
         # 'GET /clima/{provincia}'
         if place:
+
+            # Se decodifica el parámetro de la provincia para convertirlo
+            # a su formato original ('Cádiz', 'La Coruña', 'Málaga', etc),
+            # ya que en las URLs se transforman a palabras sin acentos ni
+            # eñes ni espacios
+            place = urllib.parse.unquote(place)
 
             # Se realiza la consulta a la tabla de DynamoDB cuya clave
             # primaria ('Nombre') es igual a la variable 'place'
