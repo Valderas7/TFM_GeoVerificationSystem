@@ -10,9 +10,10 @@ api_gateway_url = 'https://mjb5qk45si.execute-api.us-east-1.amazonaws.com/prod'
 
 # Barra lateral para mostrar las opciones disponibles
 st.sidebar.title("Opciones")
-action = st.sidebar.radio("Elige una opción:", 
+action = st.sidebar.radio("Elige una opción:",
                           options=["Situación meteorológica actual",
-                                   "Consultar provincia específica"])
+                                   "Consultar provincia específica",
+                                   "Estadísticas"])
 
 # Si se elige la opción 'Ver mapa general'
 if action == "Situación meteorológica actual":
@@ -21,14 +22,14 @@ if action == "Situación meteorológica actual":
     st.markdown("<h2 style='text-align: center; color: black;'> Visualizador "
                 "Interactivo de Datos Climáticos de España </h2>",
                 unsafe_allow_html=True)
-    
+
     # Descripción de lo que realiza la aplicación web
     st.markdown("Consulta información climática actualizada de cada "
                 "provincia de España de forma visual y dinámica. Este mapa "
                 "interactivo muestra datos como el clima, la temperatura y "
                 "la humedad, utilizando marcadores informativos para cada "
                 "ubicación.")
-    
+
     st.markdown("Para ver la información de una provincia basta con "
                 "hacer `click` en cualquier marcador del mapa para mostrar "
                 "el `popup` con toda la información meteorológica actual "
@@ -46,17 +47,17 @@ if action == "Situación meteorológica actual":
         # En ese caso se almacena la clave 'data', que es la lista de todos
         # los JSON de respuesta de todas las provincias y ciudades autónomas
         response_list = response['data']
-    
+
     # Si no...
     else:
-        
+
         # Mensaje de error de 'streamlit'
         st.error("No se pudo obtener datos de la API. Revisa la conexión.")
         st.stop()
 
     # Para cada diccionario de la lista...
     for provincia_dict in response_list:
-        
+
         # Se extraen los campos de 'Latitud' y 'Longitud'
         lat = provincia_dict.get("Latitud")
         lon = provincia_dict.get("Longitud")
@@ -69,12 +70,13 @@ if action == "Situación meteorológica actual":
 
                 # Se convierte el valor a un float
                 lat = float(lat)
-            
+
             # Si hay error...
             except ValueError:
 
                 # Se muestra mensaje de 'warning' y se continúa
-                st.warning(f"Latitud inválida para {provincia_dict['Nombre']}: {lat}")
+                st.warning("Latitud inválida para "
+                           f"{provincia_dict['Nombre']}: {lat}")
                 continue
 
         # Si la longitud es un 'string'...
@@ -86,18 +88,20 @@ if action == "Situación meteorológica actual":
                 # Se convierte el valor a un float
                 lon = float(lon)
 
-            # Si hay error...
+            # Si hay error de valor...
             except ValueError:
 
                 # Se muestra mensaje de 'warning' y se continúa
-                st.warning(f"Longitud inválida para {provincia_dict['Nombre']}: {lon}")
+                st.warning(f"Longitud inválida para "
+                           f"{provincia_dict['Nombre']}: {lon}")
                 continue
-        
+
         # Si la latitud o la longitud son None...
         if lat is None or lon is None:
 
             # Se muestra mensaje de 'warning' y se continúa
-            st.warning(f"Coordenadas faltantes para {provincia_dict['Nombre']}")
+            st.warning(f"Coordenadas faltantes para "
+                       f"{provincia_dict['Nombre']}")
             continue
 
         # Se crea un contenido 'popup' con el nombre de la provincia,
@@ -186,20 +190,28 @@ if action == "Consultar provincia específica":
 
                 # Mensaje de 'warning' en Streamlit
                 st.warning("No se encontraron datos para la provincia especificada.")
-        
+
         # Si la respuesta de la solicitud GET no es satisfactoria...
         else:
 
             # Mensaje de error en Streamlit
             st.error("Error al obtener los datos. Verifica el nombre de la provincia.")
 
+# Si se elige la opción 'Estadísticas'...
 if action == "Estadísticas":
+
+    # Título de la aplicación
     st.markdown("<h2 style='text-align: center; color: black;'> Estadísticas Generales </h2>", unsafe_allow_html=True)
 
-    # Realiza la petición a /clima
+    # Realiza la solicitud GET a /clima
     response = requests.get(f"{api_gateway_url}/clima").json()
+
+    # Si existe la clave 'data' en la respuesta...
     if 'data' in response:
+
+        # Se almacena en 'response_list'
         response_list = response['data']
+
         # Extraer datos para las estadísticas
         temperaturas = [float(prov['Temperatura']) for prov in response_list]
         humedad = [float(prov['Humedad']) for prov in response_list]
