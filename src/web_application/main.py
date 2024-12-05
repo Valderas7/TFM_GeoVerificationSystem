@@ -109,12 +109,14 @@ if action == "Situación meteorológica actual":
         # las 'ñ' y las tildes por sus códigos numéricos HTML con la
         # función 'convert_to_html_entities'
         popup_content = (
-            f"Provincia: {convert_to_html_entities(provincia_dict['Nombre'])}<br>"
+            f"Provincia: "
+            f"{convert_to_html_entities(provincia_dict['Nombre'])}<br>"
             f"Clima: {convert_to_html_entities(provincia_dict['Clima'])}<br>"
             f"Temperatura: {provincia_dict['Temperatura']} &#176;C<br>"
             f"Humedad: {provincia_dict['Humedad']} %<br>"
             f"Nubosidad: {provincia_dict['Nubosidad']} %<br>"
-            f"{convert_to_html_entities('Presión Atm')}: {provincia_dict['Presion_Atmosferica']} hPa<br>"
+            f"{convert_to_html_entities('Presión Atm')}: "
+            f"{provincia_dict['Presion_Atmosferica']} hPa<br>"
             f"Viento: {provincia_dict['Velocidad_Viento']} m/s<br>"
         )
 
@@ -122,21 +124,27 @@ if action == "Situación meteorológica actual":
         if float(provincia_dict['Precipitaciones']) > 0.0:
 
             # Se agregan las precipitaciones al 'popup'
-            popup_content += f"Precipitaciones: {provincia_dict['Precipitaciones']} mm/h<br>"
+            popup_content += (
+                f"Precipitaciones: "
+                f"{provincia_dict['Precipitaciones']} mm/h<br>"
+            )
 
         # Si las nevadas del diccionario son mayores de 0 mm/h...
         if float(provincia_dict['Nevadas']) > 0.0:
 
             # Se agregan las nevadas al 'popup'
-            popup_content += f"Nevadas: {provincia_dict['Nevadas']} mm/h<br>"
-        
+            popup_content += (
+                f"Nevadas: "
+                f"{provincia_dict['Nevadas']} mm/h<br>"
+            )
+
         # Se crea un 'popup' con el contenido y se especifica su ancho máximo
         popup = folium.Popup(popup_content, max_width=400)
 
         # Añadir el marcador en la localización indicada con el 'popup' de la
         # información meteorológica
         m.add_marker(location=([lat, lon]), popup=popup)
-    
+
     # Renderiza el mapa en Streamlit
     m.to_streamlit()
 
@@ -144,7 +152,10 @@ if action == "Situación meteorológica actual":
 if action == "Consultar provincia específica":
 
     # Título de la aplicación
-    st.markdown("<h2 style='text-align: center; color: black;'> Consulta por Provincia </h2>", unsafe_allow_html=True)
+    st.markdown(
+        "<h2 style='text-align: center; color: black;'> Consulta "
+        "por Provincia </h2>", unsafe_allow_html=True
+    )
 
     # Se introduce un 'widget' de texto de entrada
     provincia = st.text_input("Introduce el nombre de la provincia:")
@@ -175,7 +186,7 @@ if action == "Consultar provincia específica":
                 # longitud de la provincia
                 map_provincia = leafmap.Map(center=(lat, lon), zoom=8)
 
-                # Se crea un 'popup' 
+                # Se crea un 'popup'
                 popup = folium.Popup(f"{provincia.capitalize()}<br>{data}")
 
                 # Se añade el marcador de la provincia al mapa con el 'popup'
@@ -184,24 +195,32 @@ if action == "Consultar provincia específica":
 
                 # Se renderiza el mapa de la provincia en Streamlit
                 map_provincia.to_streamlit()
-            
+
             # Si la respuesta JSON no existe...
             else:
 
                 # Mensaje de 'warning' en Streamlit
-                st.warning("No se encontraron datos para la provincia especificada.")
+                st.warning(
+                    "No se encontraron datos para la provincia especificada."
+                )
 
         # Si la respuesta de la solicitud GET no es satisfactoria...
         else:
 
             # Mensaje de error en Streamlit
-            st.error("Error al obtener los datos. Verifica el nombre de la provincia.")
+            st.error(
+                "Error al obtener los datos. Verifica el nombre de la "
+                "provincia."
+            )
 
 # Si se elige la opción 'Estadísticas'...
 if action == "Estadísticas":
 
     # Título de la aplicación
-    st.markdown("<h2 style='text-align: center; color: black;'> Estadísticas Generales </h2>", unsafe_allow_html=True)
+    st.markdown(
+        "<h2 style='text-align: center; color: black;'> Estadísticas "
+        "Generales </h2>", unsafe_allow_html=True
+    )
 
     # Realiza la solicitud GET a /clima
     response = requests.get(f"{api_gateway_url}/clima").json()
@@ -224,11 +243,17 @@ if action == "Estadísticas":
         # Mostrar máximos y mínimos
         max_temp = max(response_list, key=lambda x: float(x['Temperatura']))
         min_temp = min(response_list, key=lambda x: float(x['Temperatura']))
-        st.write(f"Provincia más cálida: {max_temp['Nombre']} ({max_temp['Temperatura']} °C)")
-        st.write(f"Provincia más fría: {min_temp['Nombre']} ({min_temp['Temperatura']} °C)")
+        st.write(
+            f"Provincia más cálida: {max_temp['Nombre']} "
+            f"({max_temp['Temperatura']} °C)"
+        )
+        st.write(
+            f"Provincia más fría: {min_temp['Nombre']} "
+            f"({min_temp['Temperatura']} °C)"
+        )
     else:
         st.error("No se pudo obtener datos para estadísticas.")
 
 if action == "Descargar datos":
-    st.download_button("Descargar datos", data=str(response), file_name="datos_climaticos.csv")
-
+    st.download_button("Descargar datos", data=str(response),
+                       file_name="datos_climaticos.csv")

@@ -6,6 +6,10 @@ resource "aws_api_gateway_rest_api" "clima_api_gateway" {
   endpoint_configuration {
     types = ["REGIONAL"]
   }
+
+  tags = {
+    "Project" = "TFM"
+  }
 }
 
 
