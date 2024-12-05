@@ -39,3 +39,9 @@ module "api_gateway_weather" {
   source                 = "./modules/api_gateway_weather"
   lambda_uri_integration = module.lambda_query_weather_data.lambda_uri
 }
+
+
+# Se llama al módulo 'ecr_weather' para crear
+module "ecr_weather" {
+  source = "./modules/ecr_weather"
+}
