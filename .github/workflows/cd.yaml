@@ -39,8 +39,8 @@ jobs:
     - name: Comprobar si se han modificado el 'Dockerfile' o la webapp de Streamlit
       id: check_changes
       run: |
-        git fetch origin
-        CHANGED_FILES=$(git diff --name-only origin/master -- src/web_application/Dockerfile src/web_application/main.py)
+        git fetch --depth=2
+        CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
         echo "Archivos modificados: $CHANGED_FILES"
 
         if [[ "$CHANGED_FILES" == *"src/web_application/Dockerfile"* || "$CHANGED_FILES" == *"src/web_application/main.py"* ]]; then
