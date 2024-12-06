@@ -40,9 +40,10 @@ jobs:
       id: check_changes
       run: |
         git fetch origin
-        CHANGED_FILES=$(git diff --name-only origin/master HEAD)
+        CHANGED_FILES=$(git diff --name-only origin/master HEAD src/web_application/Dockerfile src/web_application/main.py)
         echo "Archivos modificados: $CHANGED_FILES"
-        if [[ "$CHANGED_FILES" == *"Dockerfile"* || "$CHANGED_FILES" == *"web_application/main.py"* ]]; then
+
+        if [[ "$CHANGED_FILES" == *"src/web_application/Dockerfile"* || "$CHANGED_FILES" == *"src/web_application/main.py"* ]]; then
           echo "Cambios detectados en Dockerfile o main.py"
           echo "run_build=true" >> $GITHUB_ENV
         else

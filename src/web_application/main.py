@@ -254,7 +254,7 @@ if action == "Estadísticas":
     else:
         st.error("No se pudo obtener datos para estadísticas.")
 
-# Si se elige opción de 'Descargar datos'...
+# Si se elige opción de 'Descargar datos'
 if action == "Descargar datos":
     st.download_button("Descargar datos", data=str(response),
                        file_name="datos_climaticos.csv")
