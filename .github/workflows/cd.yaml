@@ -15,8 +15,72 @@ on:
 # Trabajos que se ejecutan en el flujo de trabajo
 jobs:
 
-  # Nombre del trabajo nº1: Despliegue
-  Despliegue:
+  # Nombre del trabajo nº1: Build_Push_Imagen_Docker
+  Build_Push_Imagen_Docker:
+
+    # Se ejecuta en una máquina con Ubuntu
+    runs-on: ubuntu-latest
+
+    # Lista de pasos del trabajo
+    steps:
+
+    # Paso 1: Comprobar si el 'Dockerfile' o el 'main.py' se han modificado.
+    # Se almacena en 'CHANGED_FILES' los nombres de los archivos modificados
+    # entre el último 'commit' del repositorio remoto respecto al repositorio
+    # local.
+    # Si en la variable se almacena el nombre del 'Dockerfile' o del 'main.py'
+    # de la aplicación web es que se han modificado, y por tanto, la variable
+    # 'run_build' es true, indicando que se deben ejecutar los pasos para la
+    # construcción y subida de la imagen Docker
+    - name: Comprobar si se han modificado el 'Dockerfile' o la webapp de Streamlit
+      id: check_changes
+      run: |
+        git fetch origin
+        CHANGED_FILES=$(git diff --name-only origin/master HEAD)
+        echo "Archivos modificados: $CHANGED_FILES"
+        if [[ "$CHANGED_FILES" == *"Dockerfile"* || "$CHANGED_FILES" == *"web_application/main.py"* ]]; then
+          echo "Cambios detectados en Dockerfile o main.py"
+          echo "run_build=true" >> $GITHUB_ENV
+        else
+          echo "No hay cambios relevantes para la imagen Docker"
+          echo "run_build=false" >> $GITHUB_ENV
+
+    # Paso 2: Checkout del repositorio
+    - name: Checkout del repositorio
+      uses: actions/checkout@v3
+
+    # Paso 3: Configurar credenciales de AWS
+    - name: Configurar credenciales de AWS
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: us-east-1
+
+    # Paso 4: Autenticación en Amazon ECR
+    - name: Autenticarse en Amazon ECR
+      if: env.run_build == 'true'
+      run: |
+        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.ACCOUNT_AWS_ID }}.dkr.ecr.us-east-1.amazonaws.com
+
+    # Paso 5: Construir la imagen Docker
+    - name: Construir la imagen Docker
+      if: env.run_build == 'true'
+      run: docker build -t streamlit-app:1.0 ./src/web_application
+
+    # Paso 6: Etiquetar la imagen Docker para el repositorio ECR
+    - name: Etiquetar la imagen Docker
+      if: env.run_build == 'true'
+      run: docker tag streamlit-app:1.0 ${{ secrets.ACCOUNT_AWS_ID }}.dkr.ecr.us-east-1.amazonaws.com/weather_app:1.0
+
+    # Paso 7: Subir la imagen Docker a ECR
+    - name: Subir la imagen Docker a ECR
+      if: env.run_build == 'true'
+      run: docker push ${{ secrets.ACCOUNT_AWS_ID }}.dkr.ecr.us-east-1.amazonaws.com/weather_app:1.0
+
+  # Nombre del trabajo nº2: Despliegue_Terraform
+  Despliegue_Terraform:
 
     # Se ejecuta en una máquina con Ubuntu
     runs-on: ubuntu-latest
