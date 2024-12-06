@@ -256,5 +256,5 @@ if action == "Estadísticas":
 
 # Si se elige opción de 'Descargar datos'
 if action == "Descargar datos":
-    st.download_button("Descargar datos", data=str(response),
+    st.download_button("Descargar datos de la API", data=str(response),
                        file_name="datos_climaticos.csv")
