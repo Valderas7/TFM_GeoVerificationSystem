@@ -40,7 +40,7 @@ jobs:
       id: check_changes
       run: |
         git fetch origin
-        CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD src/web_application/Dockerfile src/web_application/main.py)
+        CHANGED_FILES=$(git diff --name-only origin/master -- src/web_application/Dockerfile src/web_application/main.py)
         echo "Archivos modificados: $CHANGED_FILES"
 
         if [[ "$CHANGED_FILES" == *"src/web_application/Dockerfile"* || "$CHANGED_FILES" == *"src/web_application/main.py"* ]]; then
