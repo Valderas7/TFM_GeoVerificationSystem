@@ -24,7 +24,11 @@ jobs:
     # Lista de pasos del trabajo
     steps:
 
-    # Paso 1: Comprobar si el 'Dockerfile' o el 'main.py' se han modificado.
+    # Paso 1: Checkout del repositorio
+    - name: Checkout del repositorio
+      uses: actions/checkout@v3
+
+    # Paso 2: Comprobar si el 'Dockerfile' o el 'main.py' se han modificado.
     # Se almacena en 'CHANGED_FILES' los nombres de los archivos modificados
     # entre el último 'commit' del repositorio remoto respecto al repositorio
     # local.
@@ -44,10 +48,6 @@ jobs:
         else
           echo "No hay cambios relevantes para la imagen Docker"
           echo "run_build=false" >> $GITHUB_ENV
-
-    # Paso 2: Checkout del repositorio
-    - name: Checkout del repositorio
-      uses: actions/checkout@v3
 
     # Paso 3: Configurar credenciales de AWS
     - name: Configurar credenciales de AWS
