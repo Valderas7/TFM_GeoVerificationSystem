@@ -20,7 +20,7 @@ resource "aws_ecs_task_definition" "web_application_task" {
   container_definitions = jsonencode([
     {
       name      = var.container_name
-      image     = var.repo_url + var.repo_tag
+      image     = "${var.repo_url}${var.repo_tag}"
       cpu       = var.cpu
       memory    = var.memory
       essential = true
