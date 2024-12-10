@@ -1,4 +1,4 @@
-# Providers requeridos (solamente AWS)
+# Providers requeridos (solamente AWS en su versión 5.77.0)
 terraform {
   required_providers {
     aws = {
