@@ -41,8 +41,17 @@ module "api_gateway_weather" {
 }
 
 
-# Se llama al módulo 'ecr_weather' para crear un repositorio dentro de ECR
+# Se llama al módulo 'ecr_weather_repo' para crear un repositorio dentro de ECR
 # para almacenar imágenes de Docker
-module "ecr_weather" {
-  source = "./modules/ecr_weather"
+module "ecr_weather_repo" {
+  source = "./modules/ecr_weather_repo"
+}
+
+
+# Se llama al módulo 'ecs_weather_cluster' para crear un cluster de ECS
+# pasando la URL del repositorio de ECR definida como 'output' en el
+# módulo 'ecr_weather_repo'
+module "ecs_weather_cluster" {
+  source   = "./modules/ecs_weather_cluster"
+  repo_url = module.ecr_weather_repo.repo_url
 }

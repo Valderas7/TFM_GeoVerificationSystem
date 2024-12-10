@@ -28,14 +28,17 @@ jobs:
     - name: Checkout del repositorio
       uses: actions/checkout@v3
 
-    # Paso 2: Comprobar si el 'Dockerfile' o el 'main.py' se han modificado en
-    # los 2 últimos 'commits'.
+    # Paso 2: Comprobar si el 'Dockerfile' o el 'main.py' se han modificado
+    # entre el último y el penúltimo 'commit'
     # Se almacena en 'CHANGED_FILES' los nombres de los archivos modificados
-    # entre el último y el penúltimo 'commit' del repositorio.
+    # entre el último (HEAD) y el penúltimo (HEAD^) 'commit' del repositorio.
     # Si en la variable se almacenan el nombre del 'Dockerfile' o del 'main'
     # de la aplicación web es que se han modificado, y por tanto, la variable
     # 'run_build' es true, indicando que se deben ejecutar los pasos para la
-    # construcción y subida de la imagen Docker
+    # construcción y subida de la imagen Docker.
+    # Por último, el valor de la variable 'run_build' se pasa a la variable de
+    # entorno 'GITHUB_ENV' para que su valor esté disponible en pasos
+    # posteriores de este trabajo.
     - name: Comprobar si se han modificado el 'Dockerfile' o la webapp de Streamlit
       id: check_changes
       run: |
