@@ -33,4 +33,5 @@ resource "aws_ecr_lifecycle_policy" "streamlit_lifecycle_policy" {
   ]
 }
 EOF
+  depends_on = [aws_ecr_repository.weather_repo]
 }

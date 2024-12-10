@@ -1,13 +1,13 @@
 # Variable para el nombre del cluster
 variable "cluster_name" {
   type    = string
-  default = "web_application_cluster"
+  default = "weather_web_application_cluster"
 }
 
 # Variable para el nombre de la definición de la tarea
 variable "task_definition_name" {
   type    = string
-  default = "web_application_task"
+  default = "weather_web_application_task_definition"
 }
 
 
@@ -36,7 +36,7 @@ variable "repo_tag" {
 # Variable para indicar la CPU que va a usar la definición de tarea
 variable "cpu" {
   type    = string
-  default = "1024" # 1 VCPU
+  default = "1024" # 1 vCPU
 }
 
 
@@ -50,7 +50,7 @@ variable "memory" {
 # Variable para el puerto del contenedor
 variable "container_name" {
   type    = string
-  default = "web_application_container"
+  default = "weather_web_application_container"
 }
 
 
