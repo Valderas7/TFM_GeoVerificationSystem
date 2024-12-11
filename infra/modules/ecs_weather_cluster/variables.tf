@@ -59,3 +59,17 @@ variable "container_port" {
   type    = number
   default = 8501
 }
+
+
+# Variable para el nombre del servicio
+variable "service_name" {
+  type    = string
+  default = "web_application_service"
+}
+
+
+# Variable para el número de instancias de contenedor de ECS
+variable "instances_number" {
+  type    = number
+  default = 2
+}

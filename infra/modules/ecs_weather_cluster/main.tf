@@ -35,3 +35,20 @@ resource "aws_ecs_task_definition" "web_application_task" {
     }
   ])
 }
+
+
+# Recurso para crear un servicio ECS en el cluster y con la definición de
+# tarea definidas. Se le asigna una IP pública
+resource "aws_ecs_service" "web_application_service" {
+  name            = var.service_name
+  cluster         = aws_ecs_cluster.web_application_cluster.arn
+  task_definition = aws_ecs_task_definition.web_application_task.family
+  desired_count   = var.instances_number
+  launch_type     = "FARGATE"
+  depends_on      = [aws_ecs_cluster.web_application_cluster, aws_ecs_task_definition.web_application_task]
+
+  network_configuration {
+    assign_public_ip = true
+    subnets          = []
+  }
+}
