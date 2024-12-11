@@ -73,3 +73,17 @@ variable "instances_number" {
   type    = number
   default = 2
 }
+
+
+# Variable para las subredes de la VPC definida en el
+# módulo 'vpc_weather_network'
+variable "subnets" {
+  type = string
+}
+
+
+# Variable para el 'Security Group' de la VPC definida en el
+# módulo 'vpc_weather_network'
+variable "security_group" {
+  type = string
+}

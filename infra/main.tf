@@ -53,6 +53,15 @@ module "ecr_weather_repo" {
 # módulo 'ecr_weather_repo', además de una definición de tarea para lanzar
 # el contenedor
 module "ecs_weather_cluster" {
-  source   = "./modules/ecs_weather_cluster"
-  repo_url = module.ecr_weather_repo.repo_url
+  source         = "./modules/ecs_weather_cluster"
+  repo_url       = module.ecr_weather_repo.repo_url
+  subnets        = module.vpc_weather_network.subnets
+  security_group = module.vpc_weather_network.security_group
+}
+
+
+# Se llama al módulo 'vpc_weather_network' para crear los recursos de red
+# que se van a usar para el servicio de ECS
+module "vpc_weather_network" {
+  source = "./modules/vpc_weather_network"
 }
