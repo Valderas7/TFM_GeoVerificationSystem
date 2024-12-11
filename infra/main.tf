@@ -51,7 +51,7 @@ module "ecr_weather_repo" {
 # Se llama al módulo 'ecs_weather_cluster' para crear un cluster de ECS
 # pasando la URL del repositorio de ECR definida como 'output' en el
 # módulo 'ecr_weather_repo'
-module "ecs_weather_cluster" {
-  source   = "./modules/ecs_weather_cluster"
-  repo_url = module.ecr_weather_repo.repo_url
-}
+#module "ecs_weather_cluster" {
+  #source   = "./modules/ecs_weather_cluster"
+  #repo_url = module.ecr_weather_repo.repo_url
+#}
