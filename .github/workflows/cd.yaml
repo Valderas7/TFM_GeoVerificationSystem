@@ -77,12 +77,12 @@ jobs:
     # Paso 6: Etiquetar la imagen Docker para el repositorio ECR (solo si 'run_build' es true)
     - name: Etiquetar la imagen Docker
       if: env.run_build == 'true'
-      run: docker tag streamlit-app:1.0 ${{ secrets.ACCOUNT_AWS_ID }}.dkr.ecr.us-east-1.amazonaws.com/weather_web_application:latest:1.0
+      run: docker tag streamlit-app:1.0 ${{ secrets.ACCOUNT_AWS_ID }}.dkr.ecr.us-east-1.amazonaws.com/weather_web_application:1.0
 
     # Paso 7: Subir la imagen Docker a ECR (solo si 'run_build' es true)
     - name: Subir la imagen Docker a ECR
       if: env.run_build == 'true'
-      run: docker push ${{ secrets.ACCOUNT_AWS_ID }}.dkr.ecr.us-east-1.amazonaws.com/weather_web_application:latest:1.0
+      run: docker push ${{ secrets.ACCOUNT_AWS_ID }}.dkr.ecr.us-east-1.amazonaws.com/weather_web_application:1.0
 
   # Nombre del trabajo nº2: Despliegue_Terraform
   Despliegue_Terraform:
