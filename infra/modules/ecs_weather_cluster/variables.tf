@@ -78,7 +78,7 @@ variable "instances_number" {
 # Variable para las subredes de la VPC definida en el
 # módulo 'vpc_weather_network'
 variable "subnets" {
-  type = string
+  type = list(string)
 }
 
 
