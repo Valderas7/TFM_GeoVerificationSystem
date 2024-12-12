@@ -1,6 +1,6 @@
 # 'Output' para almacenar las subredes del módulo
 output "subnets" {
-  value = aws_subnet.web_application_subnets.id
+  value = aws_subnet.web_application_subnets.*.id
 }
 
 
