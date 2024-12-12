@@ -50,6 +50,6 @@ resource "aws_ecs_service" "web_application_service" {
   network_configuration {
     assign_public_ip = true
     security_groups  = [var.security_group]
-    subnets          = [var.subnets]
+    subnets          = var.subnets
   }
 }
