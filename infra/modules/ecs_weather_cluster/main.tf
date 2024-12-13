@@ -38,7 +38,9 @@ resource "aws_ecs_task_definition" "web_application_task" {
 
 
 # Recurso para crear un servicio ECS en el cluster y con la definición de
-# tarea definidas. Se le asigna una IP pública
+# tarea definidas. Se le asigna una IP pública, el grupo de seguridad y las
+# subredes creadas en el módulo de 'VPC' para realizar la configuración de
+# red del servicio
 resource "aws_ecs_service" "web_application_service" {
   name            = var.service_name
   cluster         = aws_ecs_cluster.web_application_cluster.arn
