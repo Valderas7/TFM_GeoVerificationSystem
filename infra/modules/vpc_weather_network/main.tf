@@ -7,16 +7,18 @@ data "aws_availability_zones" "available" {
 
 
 # Recurso para crear una VPC con un CIDR privado en el que hay
-# un total de 256 direcciones IP
+# un total de 256 direcciones IP para dispositivos dentro de dicha red
 resource "aws_vpc" "web_application_vpc" {
   cidr_block = "10.0.0.0/24"
 
   tags = {
     "Project" = "TFM"
+    "Name"    = "web-application-vpc"
   }
 }
 
-# Recurso para crear subredes
+# Se crean dos recursos para crear subredes (una subred por recurso) dentro
+# de la VPC creada
 resource "aws_subnet" "web_application_subnets" {
   count                   = 2
   vpc_id                  = aws_vpc.web_application_vpc.id
@@ -26,6 +28,7 @@ resource "aws_subnet" "web_application_subnets" {
 
   tags = {
     "Project" = "TFM"
+    "Name"    = "web-application-subnet-${count.index}"
   }
 }
 
@@ -80,6 +83,7 @@ resource "aws_route_table" "web_application_route_table" {
 
   tags = {
     "Project" = "TFM"
+    "Name"    = "web-application-route-table"
   }
 }
 
