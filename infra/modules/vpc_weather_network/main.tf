@@ -1,6 +1,6 @@
 # Bloque de datos que permite el acceso a la lista de zonas de
-# disponibilidad que pueden ser accedidas por la cuenta AWS dentro de la
-# región configurada en el 'provider' de AWS
+# disponibilidad que están disponibles dentro de la región configurada
+# en el 'provider' de AWS
 data "aws_availability_zones" "available" {
   state = "available"
 }
@@ -18,7 +18,8 @@ resource "aws_vpc" "web_application_vpc" {
 }
 
 # Se crean dos recursos para crear subredes (una subred por recurso) dentro
-# de la VPC creada
+# de la VPC creada. Cada subred estará dentro e una zona de disponibilidad
+# distinta
 resource "aws_subnet" "web_application_subnets" {
   count                   = 2
   vpc_id                  = aws_vpc.web_application_vpc.id
@@ -55,6 +56,7 @@ resource "aws_security_group" "web_application_security_group" {
 
   tags = {
     "Project" = "TFM"
+    "Name" = "web_application_security_group"
   }
 }
 
@@ -67,6 +69,7 @@ resource "aws_internet_gateway" "web_application_igw" {
 
   tags = {
     "Project" = "TFM"
+    "Name" = "web_application_igw"
   }
 }
 
