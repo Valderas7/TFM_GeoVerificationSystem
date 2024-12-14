@@ -78,9 +78,9 @@ resource "aws_internet_gateway" "web_application_igw" {
 
 
 # Recurso para crear una tabla de enrutamiento para la VPC de forma
-# que se redirija todo el tráfico saliente de ella a la 'Puerta de enlace
-# a Internet'. Como consecuencia, las redes asociadas a esta tabla de
-# enrutamiento van a ser públicas.
+# que se redirija todo el tráfico saliente de instancias a la 'Puerta de
+# enlace a Internet' antes de pasar a la IP de destino. Como consecuencia,
+# las redes asociadas a esta tabla de enrutamiento van a ser públicas.
 resource "aws_route_table" "web_application_route_table" {
   vpc_id = aws_vpc.web_application_vpc.id
 
