@@ -38,7 +38,9 @@ resource "aws_subnet" "web_application_subnets" {
 
 # Recurso para crear un 'Grupo de Seguridad' que permite el tráfico entrante
 # exclusivamente en el puerto 8501 desde cualquier IP mediante 'TCP'. También
-# se permite el tráfico saliente hacia todas las IPs y puertos.
+# se permite el tráfico saliente hacia todas las IPs y puertos mediante todos
+# los protocolos (TCP, UDP, ICMP...), algo necesario para conectarse a ECR
+# y usar una imagen de Docker.
 resource "aws_security_group" "web_application_security_group" {
   vpc_id = aws_vpc.web_application_vpc.id
 
@@ -76,7 +78,7 @@ resource "aws_internet_gateway" "web_application_igw" {
 
 
 # Recurso para crear una tabla de enrutamiento para la VPC de forma
-# que se redirija todo el tráfico saliente a la 'Puerta de enlace
+# que se redirija todo el tráfico saliente de ella a la 'Puerta de enlace
 # a Internet'. Como consecuencia, las redes asociadas a esta tabla de
 # enrutamiento van a ser públicas.
 resource "aws_route_table" "web_application_route_table" {

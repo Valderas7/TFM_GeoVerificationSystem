@@ -44,10 +44,9 @@ resource "aws_ecs_task_definition" "web_application_task" {
 resource "aws_ecs_service" "web_application_service" {
   name            = var.service_name
   cluster         = aws_ecs_cluster.web_application_cluster.arn
-  task_definition = aws_ecs_task_definition.web_application_task.family
+  task_definition = "${aws_ecs_task_definition.web_application_task.family}:${aws_ecs_task_definition.web_application_task.revision}"
   desired_count   = var.instances_number
   launch_type     = "FARGATE"
-  depends_on      = [aws_ecs_cluster.web_application_cluster, aws_ecs_task_definition.web_application_task]
 
   network_configuration {
     assign_public_ip = true
