@@ -77,7 +77,8 @@ resource "aws_internet_gateway" "web_application_igw" {
 
 # Recurso para crear una tabla de enrutamiento para la VPC de forma
 # que se redirija todo el tráfico saliente a la 'Puerta de enlace
-# a Internet'. Como consecuencia, las subredes son públicas.
+# a Internet'. Como consecuencia, las redes asociadas a esta tabla de
+# enrutamiento van a ser públicas.
 resource "aws_route_table" "web_application_route_table" {
   vpc_id = aws_vpc.web_application_vpc.id
 
@@ -93,10 +94,12 @@ resource "aws_route_table" "web_application_route_table" {
 }
 
 
-# Se crean dos recursos de asociación: cada uno de ellos servirá para
-# asociar la tabla de enrutamiento con la subred correspondiente
+# Se crean dos recursos de asociación (uno para cada subred): cada uno de
+# estos recursos asocia la tabla de enrutamiento (que redirije el tráfico
+# a la 'Puerta de enlace a Internet') con la subred correspondiente, haciendo
+# las subredes públicas.
 resource "aws_route_table_association" "web_application_route_table_association" {
-  count          = 2
+  count          = var.subnets_count
   subnet_id      = aws_subnet.web_application_subnets[count.index].id
   route_table_id = aws_route_table.web_application_route_table.id
 }
