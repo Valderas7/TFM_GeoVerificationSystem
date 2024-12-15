@@ -36,14 +36,14 @@ variable "repo_tag" {
 # Variable para indicar la CPU que va a usar la definición de tarea
 variable "cpu" {
   type    = number
-  default = 1024 # 1 vCPU
+  default = 512 # 0.5 vCPU
 }
 
 
 # Variable para indicar la memoria que va a usar la definición de tarea
 variable "memory" {
   type    = number
-  default = 1024 # 1 GB RAM
+  default = 512 # 512 MB RAM
 }
 
 
