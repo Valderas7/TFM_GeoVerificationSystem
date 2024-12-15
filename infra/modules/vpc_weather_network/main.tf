@@ -1,6 +1,6 @@
 # Bloque de datos que permite el acceso a la lista de zonas de
 # disponibilidad que están disponibles dentro de la región configurada
-# en el 'provider' de AWS.
+# en el proveedor de AWS.
 data "aws_availability_zones" "available" {
   state = "available"
 }
@@ -36,11 +36,10 @@ resource "aws_subnet" "web_application_subnets" {
 }
 
 
-# Recurso para crear un 'Grupo de Seguridad' que permite el tráfico entrante
+# Recurso para crear un grupo de seguridad que permite el tráfico entrante
 # exclusivamente en el puerto 8501 desde cualquier IP mediante 'TCP'. También
 # se permite el tráfico saliente hacia todas las IPs y puertos mediante todos
-# los protocolos (TCP, UDP, ICMP...), algo necesario para conectarse a ECR
-# y usar una imagen de Docker.
+# los protocolos (TCP, UDP, ICMP...), algo necesario para conectarse a ECR.
 resource "aws_security_group" "web_application_security_group" {
   vpc_id = aws_vpc.web_application_vpc.id
 
@@ -65,8 +64,8 @@ resource "aws_security_group" "web_application_security_group" {
 }
 
 
-# Recurso para crear una 'Puerta de enlace a Internet' para que la VPC, y
-# por tanto, sus subredes, tengan acceso a Internet.
+# Recurso para crear una puerta de enlace de internet que se conecta a la VPC
+# y que permite el acceso a internet.
 resource "aws_internet_gateway" "web_application_igw" {
   vpc_id = aws_vpc.web_application_vpc.id
 
@@ -78,9 +77,9 @@ resource "aws_internet_gateway" "web_application_igw" {
 
 
 # Recurso para crear una tabla de enrutamiento para la VPC de forma
-# que se redirija todo el tráfico saliente de instancias a la 'Puerta de
-# enlace a Internet' antes de pasar a la IP de destino. Como consecuencia,
-# las redes asociadas a esta tabla de enrutamiento van a ser públicas.
+# que se redirija todo el tráfico saliente a la puerta de enlace de internet
+# antes de pasar a la IP de destino. Como consecuencia, las redes asociadas
+# a esta tabla de enrutamiento van a ser públicas.
 resource "aws_route_table" "web_application_route_table" {
   vpc_id = aws_vpc.web_application_vpc.id
 
@@ -98,7 +97,7 @@ resource "aws_route_table" "web_application_route_table" {
 
 # Se crean dos recursos de asociación (uno para cada subred): cada uno de
 # estos recursos asocia la tabla de enrutamiento (que redirije el tráfico
-# a la 'Puerta de enlace a Internet') con la subred correspondiente, haciendo
+# a la puerta de enlace de internet) con la subred correspondiente, haciendo
 # las subredes públicas.
 resource "aws_route_table_association" "web_application_route_table_association" {
   count          = var.subnets_count
