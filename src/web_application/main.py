@@ -169,7 +169,7 @@ if action == "Consultar provincia específica":
                 "cuadro de texto se muestra el `JSON` de respuesta de la "
                 "`API` con todos los datos climáticos además de mostrar en "
                 "el mapa donde está situada dicha provincia.")
-    
+
     # Se obtiene la lista de provincias y ciudades autónomas; y tras obtenerla
     # se llama a 'translate_province_list' para renombrar correctamente
     # algunas provincias (Ej: Áraba a Álava)
@@ -244,8 +244,8 @@ if action == "Estadísticas":
     # Descripción de lo que realiza la aplicación web
     st.markdown("En esta sección se muestran estadísticas a partir de la "
                 "información climática recopilada para cada una de las "
-                 "provincias.")
-    
+                "provincias.")
+
     # Se intenta ejecutar el siguiente bloque de código...
     try:
 
