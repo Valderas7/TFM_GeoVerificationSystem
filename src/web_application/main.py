@@ -252,10 +252,10 @@ if action == "Estadísticas":
         # Se realiza la solicitud 'GET /clima' y obtener el JSON de
         # respuesta de todas las provincias
         response = requests.get(f"{api_gateway_url}/clima").json()
-    
+
     # Si hay excepción con la solicitud a la API...
     except requests.RequestException:
-        
+
         # Se indica un mensaje de error de Streamlit
         st.error("No se pudo conectar con la API. Intentalo más tarde.")
 
@@ -264,7 +264,7 @@ if action == "Estadísticas":
 
     # Si la clave 'data' existe en la respuesta
     if "data" in response:
-        
+
         # Se almacena dicha clave en 'response_list'
         response_list = response["data"]
 

@@ -29,6 +29,7 @@ resource "aws_ecs_task_definition" "web_application_task" {
       portMappings = [
         {
           containerPort = var.container_port
+          hostPort      = var.host_port
           protocol      = "tcp"
         }
       ]

@@ -61,6 +61,13 @@ variable "container_port" {
 }
 
 
+# Variable para el puerto del host
+variable "host_port" {
+  type    = number
+  default = 80
+}
+
+
 # Variable para el nombre del servicio
 variable "service_name" {
   type    = string
