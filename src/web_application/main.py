@@ -4,6 +4,8 @@ import requests
 import leafmap.foliumap as leafmap
 import folium
 from utils.html_entities import convert_to_html_entities
+from utils.geography_utils import (get_provinces_and_autonomous_cities,
+                                   translate_province_list)
 
 # Se guarda en una variable la URL de la API Gateway desplegada con AWS
 api_gateway_url = 'https://mjb5qk45si.execute-api.us-east-1.amazonaws.com/prod'
@@ -26,8 +28,9 @@ if action == "Situación meteorológica actual":
     # Descripción de lo que realiza la aplicación web
     st.markdown("Consulta información climática actualizada de cada "
                 "provincia de España de forma visual y dinámica. Este mapa "
-                "interactivo muestra datos como el clima, la temperatura y "
-                "la humedad, utilizando marcadores informativos para cada "
+                "interactivo muestra datos como el clima, la temperatura, la "
+                "humedad o las precipitaciones y nevadas (en caso de que las "
+                "hubiera) utilizando marcadores informativos para cada "
                 "ubicación.")
 
     st.markdown("Para ver la información de una provincia basta con "
@@ -139,10 +142,10 @@ if action == "Situación meteorológica actual":
             )
 
         # Se crea un 'popup' con el contenido y se especifica su ancho máximo
-        popup = folium.Popup(popup_content, max_width=400)
+        popup = folium.Popup(popup_content, max_width=400, sticky=False)
 
-        # Añadir el marcador en la localización indicada con el 'popup' de la
-        # información meteorológica
+        # Añadir el marcador al mapa en la localización indicada con el
+        # 'popup' de la información meteorológica
         m.add_marker(location=([lat, lon]), popup=popup)
 
     # Renderiza el mapa en Streamlit
@@ -153,17 +156,33 @@ if action == "Consultar provincia específica":
 
     # Título de la aplicación
     st.markdown(
-        "<h2 style='text-align: center; color: black;'> Consulta "
-        "por Provincia </h2>", unsafe_allow_html=True
+        "<h2 style='text-align: center; color: black;'> Consultar Provincia "
+        "Específica </h2>", unsafe_allow_html=True
     )
 
-    # Se introduce un 'widget' de texto de entrada
-    provincia = st.text_input("Introduce el nombre de la provincia:")
+    # Descripción de lo que realiza la aplicación web
+    st.markdown("Consulta información climática actualizada de una "
+                "provincia específica. Al introducir dicha provincia en el "
+                "cuadro de texto se muestra el `JSON` de respuesta de la "
+                "`API` con todos los datos climáticos además de mostrar en "
+                "el mapa donde está situada dicha provincia.")
+    
+    # Se obtiene la lista de provincias y ciudades autónomas; y tras obtenerla
+    # se llama a 'translate_province_list' para renombrar correctamente
+    # algunas provincias (Ej: Áraba a Álava)
+    provinces_list = translate_province_list(
+        get_provinces_and_autonomous_cities()
+    )
+
+    # Se introduce un 'widget' de selección de provincia
+    provincia = st.selectbox(label="Selecciona el nombre de la provincia:",
+                             options=provinces_list)
 
     # Cuando se introduce una provincia...
     if provincia:
 
         # Se hace una solicitud GET a la API Gateway en '/clima/{provincia}'
+        # (aunque la provincia tenga tilde, en la URL aparece sin él)
         response = requests.get(f"{api_gateway_url}/clima/{provincia}")
 
         # Si la respuesta es satisfactoria...
@@ -184,16 +203,12 @@ if action == "Consultar provincia específica":
 
                 # Se crea un mapa centrado en los valores de latitud y
                 # longitud de la provincia
-                map_provincia = leafmap.Map(center=(lat, lon), zoom=8)
+                map_provincia = leafmap.Map(center=(lat, lon), zoom=6)
 
-                # Se crea un 'popup'
-                popup = folium.Popup(f"{provincia.capitalize()}<br>{data}")
+                # Se añade el marcador de la provincia al mapa
+                map_provincia.add_marker(location=(lat, lon))
 
-                # Se añade el marcador de la provincia al mapa con el 'popup'
-                # creado
-                map_provincia.add_marker(location=(lat, lon), popup=popup)
-
-                # Se renderiza el mapa de la provincia en Streamlit
+                # Se renderiza el mapa en Streamlit
                 map_provincia.to_streamlit()
 
             # Si la respuesta JSON no existe...
