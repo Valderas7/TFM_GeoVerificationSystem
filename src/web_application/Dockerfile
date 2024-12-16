@@ -28,5 +28,5 @@ EXPOSE 80
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
 # Se ejecuta la APP de streamlit con el código copiado en la imagen
-# especificando la IP (127.0.0.1) y el puerto (8501) donde se servirá
-ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# especificando la IP (127.0.0.1) y el puerto (80) donde se servirá
+ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=80", "--server.address=0.0.0.0"]
