@@ -43,7 +43,7 @@ variable "cpu" {
 # Variable para indicar la memoria que va a usar la definición de tarea
 variable "memory" {
   type    = number
-  default = 512 # 512 MB RAM
+  default = 1024 # 1 GB RAM
 }
 
 
