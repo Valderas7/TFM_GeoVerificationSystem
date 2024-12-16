@@ -37,15 +37,15 @@ resource "aws_subnet" "web_application_subnets" {
 
 
 # Recurso para crear un grupo de seguridad que permite el tráfico entrante
-# exclusivamente en el puerto 8501 desde cualquier IP mediante 'TCP'. También
+# exclusivamente en el puerto 80 desde cualquier IP mediante 'TCP'. También
 # se permite el tráfico saliente hacia todas las IPs y puertos mediante todos
 # los protocolos (TCP, UDP, ICMP...), algo necesario para conectarse a ECR.
 resource "aws_security_group" "web_application_security_group" {
   vpc_id = aws_vpc.web_application_vpc.id
 
   ingress {
-    from_port   = 8501
-    to_port     = 8501
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
