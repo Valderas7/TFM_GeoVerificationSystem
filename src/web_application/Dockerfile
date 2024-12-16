@@ -14,6 +14,8 @@ COPY utils/ ./utils/
 RUN apt-get update && pip install --no-cache-dir streamlit==1.40.2 \
     requests==2.32.3 \
     pycountry==24.6.1 \
+    matplotlib==3.9.2 \
+    seaborn==0.13.2 \
     pandas==2.2.3 \
     leafmap==0.40.1 \
     && apt-get clean \

@@ -1,10 +1,11 @@
 # Librerías
 import streamlit as st
 import pandas as pd
-import altair as alt
 import requests
 import leafmap.foliumap as leafmap
 import folium
+import matplotlib.pyplot as plt
+import seaborn as sns
 from utils.html_entities import convert_to_html_entities
 from utils.geography_utils import (get_provinces_and_autonomous_cities,
                                    translate_province_list)
@@ -260,50 +261,90 @@ if action == "Estadísticas":
         # Se almacena dicha clave en 'response_list'
         response_list = response["data"]
 
-        # Se crea un dataframe para facilitar el manejo de datos
+        # Se crea un dataframe para facilitar el manejo de datos (cada clave
+        # de los JSON es una columna)
         data = pd.DataFrame(response_list)
 
-        # Convertir columnas relevantes a numéricas
-        data["Temperatura"] = pd.to_numeric(data["Temperatura"], errors="coerce")
-        data["Humedad"] = pd.to_numeric(data["Humedad"], errors="coerce")
-        data = data.dropna(subset=["Temperatura", "Humedad"])
+        # Se recopilan en una lista las columnas numéricas de tipo 'string'
+        columns_float = [
+            "Temperatura",
+            "Humedad",
+            "Velocidad_Viento",
+            "Presion_Atmosferica",
+            "Precipitaciones",
+            "Nevadas",
+            "Nubosidad",
+        ]
 
-        # Mostrar gráficos
-        st.markdown("### Temperaturas por provincia")
-        temp_chart = (
-            alt.Chart(data)
-            .mark_bar()
-            .encode(
-                x=alt.X("Nombre:N", sort="-y", title="Provincias"),
-                y=alt.Y("Temperatura:Q", title="Temperatura (°C)"),
-                tooltip=["Nombre", "Temperatura"],
-            )
-            .properties(width=800, height=400)
-        )
-        st.altair_chart(temp_chart)
+        # Para cada columna...
+        for col in columns_float:
 
-        st.markdown("### Humedad por provincia")
-        humidity_chart = (
-            alt.Chart(data)
-            .mark_line(point=True)
-            .encode(
-                x=alt.X("Nombre:N", sort="-y", title="Provincias"),
-                y=alt.Y("Humedad:Q", title="Humedad (%)"),
-                tooltip=["Nombre", "Humedad"],
-            )
-            .properties(width=800, height=400)
-        )
-        st.altair_chart(humidity_chart)
+            # Se convierten los valores a tipo 'float'
+            data[col] = data[col].astype(float)
 
-        # Calcular máximos y mínimos
+        # Promedios generales de los valores de todas las provincias
+        st.subheader("Promedios Generales")
+        st.write(data[columns_float].mean().round(2))
+
+        # Gráfico de barras: Temperatura por provincia
+        st.subheader("Temperatura por Provincia")
+        fig = plt.figure(figsize=(10, 6))
+        sns.barplot(x="Temperatura", y="Nombre", data=data, palette="coolwarm")
+        plt.xlabel("Temperatura (°C)")
+        plt.ylabel("Provincia")
+        st.pyplot(fig)
+
+        # Gráfico de líneas: Humedad por provincia
+        st.subheader("Humedad por Provincia")
+        fig = plt.figure(figsize=(10, 6))
+        sns.lineplot(x="Nombre", y="Humedad", data=data, marker="o", color="blue")
+        plt.xlabel("Provincia")
+        plt.ylabel("Humedad (%)")
+        plt.xticks(rotation=90)
+        st.pyplot(fig)
+
+        # Gráfico de barras: Velocidad del viento
+        st.subheader("Velocidad del Viento por Provincia")
+        fig = plt.figure(figsize=(10, 6))
+        sns.barplot(x="Velocidad_Viento", y="Nombre", data=data, palette="viridis")
+        plt.xlabel("Velocidad del Viento (km/h)")
+        plt.ylabel("Provincia")
+        fig = st.pyplot(fig)
+
+        # Valores extremos: Máximos y mínimos
+        st.subheader("Valores Extremos")
         max_temp = data.loc[data["Temperatura"].idxmax()]
         min_temp = data.loc[data["Temperatura"].idxmin()]
-        avg_temp = data["Temperatura"].mean()
+        st.write(
+            f"Provincia más cálida: {max_temp['Nombre']} "
+            f"({max_temp['Temperatura']} °C)"
+        )
+        st.write(
+            f"Provincia más fría: {min_temp['Nombre']} "
+            f"({min_temp['Temperatura']} °C)"
+        )
 
-        st.markdown("### Estadísticas generales")
-        st.write(f"**Provincia más cálida:** {max_temp['Nombre']} ({max_temp['Temperatura']} °C)")
-        st.write(f"**Provincia más fría:** {min_temp['Nombre']} ({min_temp['Temperatura']} °C)")
-        st.write(f"**Temperatura media en España:** {avg_temp:.2f} °C")
+        # Máxima nubosidad
+        max_nub = data.loc[data["Nubosidad"].idxmax()]
+        st.write(
+            f"Provincia con mayor nubosidad: {max_nub['Nombre']} "
+            f"({max_nub['Nubosidad']}%)"
+        )
+
+        # Mayor velocidad del viento
+        max_viento = data.loc[data["Velocidad_Viento"].idxmax()]
+        st.write(
+            f"Provincia con mayor velocidad de viento: {max_viento['Nombre']} "
+            f"({max_viento['Velocidad_Viento']} km/h)"
+        )
+
+        # Gráfico de dispersión: Temperatura vs Nubosidad
+        st.subheader("Relación entre Temperatura y Nubosidad")
+        fig = plt.figure(figsize=(10, 6))
+        sns.scatterplot(x="Temperatura", y="Nubosidad", data=data, hue="Nombre", palette="tab10")
+        plt.xlabel("Temperatura (°C)")
+        plt.ylabel("Nubosidad (%)")
+        st.pyplot(fig)
 
     else:
         st.error("No se pudo obtener datos para estadísticas.")
