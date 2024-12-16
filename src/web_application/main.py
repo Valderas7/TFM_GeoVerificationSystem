@@ -4,8 +4,8 @@ import pandas as pd
 import requests
 import leafmap.foliumap as leafmap
 import folium
-import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.pyplot as plt
 from utils.html_entities import convert_to_html_entities
 from utils.geography_utils import (get_provinces_and_autonomous_cities,
                                    translate_province_list)
@@ -14,7 +14,7 @@ from utils.geography_utils import (get_provinces_and_autonomous_cities,
 api_gateway_url = 'https://mjb5qk45si.execute-api.us-east-1.amazonaws.com/prod'
 
 # Barra lateral para mostrar las opciones disponibles
-st.sidebar.title("Opciones")
+st.sidebar.title("Secciones")
 action = st.sidebar.radio("Elige una opción:",
                           options=["Situación meteorológica actual",
                                    "Consultar provincia específica",
@@ -241,6 +241,11 @@ if action == "Estadísticas":
         "Generales </h2>", unsafe_allow_html=True
     )
 
+    # Descripción de lo que realiza la aplicación web
+    st.markdown("En esta sección se muestran estadísticas a partir de la "
+                "información climática recopilada para cada una de las "
+                 "provincias.")
+    
     # Se intenta ejecutar el siguiente bloque de código...
     try:
 
@@ -253,6 +258,8 @@ if action == "Estadísticas":
         
         # Se indica un mensaje de error de Streamlit
         st.error("No se pudo conectar con la API. Intentalo más tarde.")
+
+        # Se para la aplicación
         st.stop()
 
     # Si la clave 'data' existe en la respuesta
@@ -282,74 +289,57 @@ if action == "Estadísticas":
             # Se convierten los valores a tipo 'float'
             data[col] = data[col].astype(float)
 
-        # Promedios generales de los valores de todas las provincias
+        # 1. **Promedios Generales**
         st.subheader("Promedios Generales")
-        st.write(data[columns_float].mean().round(2))
+        promedios = data[columns_float].mean().round(2)
+        st.write(promedios)
 
-        # Gráfico de barras: Temperatura por provincia
-        st.subheader("Temperatura por Provincia")
-        fig = plt.figure(figsize=(10, 6))
-        sns.barplot(x="Temperatura", y="Nombre", data=data, palette="coolwarm")
-        plt.xlabel("Temperatura (°C)")
-        plt.ylabel("Provincia")
+        # 2. **Máximos y Mínimos**
+        st.subheader("Máximos y Mínimos de Temperatura")
+        max_temp = data.loc[data['Temperatura'].idxmax()]
+        min_temp = data.loc[data['Temperatura'].idxmin()]
+
+        st.write(f"Provincia más cálida: {max_temp['Nombre']} ({max_temp['Temperatura']} °C)")
+        st.write(f"Provincia más fría: {min_temp['Nombre']} ({min_temp['Temperatura']} °C)")
+
+        # 3. **Distribución de Temperaturas**
+        st.subheader("Distribución de Temperaturas")
+        temperaturas = data[['Nombre', 'Temperatura']].sort_values(by='Temperatura', ascending=False)
+        st.bar_chart(temperaturas.set_index('Nombre')['Temperatura'])
+
+        # 4. **Distribución de Humedad**
+        st.subheader("Distribución de Humedad")
+        humedad = data[['Nombre', 'Humedad']].sort_values(by='Humedad', ascending=False)
+        st.bar_chart(humedad.set_index('Nombre')['Humedad'])
+
+        # 5. **Frecuencia de Condiciones Climáticas**
+        st.subheader("Frecuencia de Condiciones Climáticas")
+        clima_counts = data['Clima'].value_counts()
+        st.bar_chart(clima_counts)
+
+        # 6. **Precipitaciones Totales**
+        st.subheader("Precipitaciones Totales")
+        precipitaciones = data[['Nombre', 'Precipitaciones']].sort_values(by='Precipitaciones', ascending=False)
+        st.bar_chart(precipitaciones.set_index('Nombre')['Precipitaciones'])
+
+        # 7. **Top 10 Más Calientes**
+        st.subheader("Top 10 Más Calientes")
+        top_10_calientes = data[['Nombre', 'Temperatura']].sort_values(by='Temperatura', ascending=False).head(10)
+        st.bar_chart(top_10_calientes.set_index('Nombre')['Temperatura'])
+
+        # 8. **Top 10 Más Frías**
+        st.subheader("Top 10 Más Frías")
+        top_10_frias = data[['Nombre', 'Temperatura']].sort_values(by='Temperatura', ascending=True).head(10)
+        st.bar_chart(top_10_frias.set_index('Nombre')['Temperatura'])
+
+        # 9. **Correlación entre Variables**
+        st.subheader("Matriz de Correlación")
+        corr = data[columns_float].corr()
+        fig = plt.figure(figsize=(10, 8))
+        sns.heatmap(corr, annot=True, cmap='coolwarm')
         st.pyplot(fig)
 
-        # Gráfico de líneas: Humedad por provincia
-        st.subheader("Humedad por Provincia")
-        fig = plt.figure(figsize=(10, 6))
-        sns.lineplot(x="Nombre", y="Humedad", data=data, marker="o", color="blue")
-        plt.xlabel("Provincia")
-        plt.ylabel("Humedad (%)")
-        plt.xticks(rotation=90)
-        st.pyplot(fig)
-
-        # Gráfico de barras: Velocidad del viento
-        st.subheader("Velocidad del Viento por Provincia")
-        fig = plt.figure(figsize=(10, 6))
-        sns.barplot(x="Velocidad_Viento", y="Nombre", data=data, palette="viridis")
-        plt.xlabel("Velocidad del Viento (km/h)")
-        plt.ylabel("Provincia")
-        fig = st.pyplot(fig)
-
-        # Valores extremos: Máximos y mínimos
-        st.subheader("Valores Extremos")
-        max_temp = data.loc[data["Temperatura"].idxmax()]
-        min_temp = data.loc[data["Temperatura"].idxmin()]
-        st.write(
-            f"Provincia más cálida: {max_temp['Nombre']} "
-            f"({max_temp['Temperatura']} °C)"
-        )
-        st.write(
-            f"Provincia más fría: {min_temp['Nombre']} "
-            f"({min_temp['Temperatura']} °C)"
-        )
-
-        # Máxima nubosidad
-        max_nub = data.loc[data["Nubosidad"].idxmax()]
-        st.write(
-            f"Provincia con mayor nubosidad: {max_nub['Nombre']} "
-            f"({max_nub['Nubosidad']}%)"
-        )
-
-        # Mayor velocidad del viento
-        max_viento = data.loc[data["Velocidad_Viento"].idxmax()]
-        st.write(
-            f"Provincia con mayor velocidad de viento: {max_viento['Nombre']} "
-            f"({max_viento['Velocidad_Viento']} km/h)"
-        )
-
-        # Gráfico de dispersión: Temperatura vs Nubosidad
-        st.subheader("Relación entre Temperatura y Nubosidad")
-        fig = plt.figure(figsize=(10, 6))
-        sns.scatterplot(x="Temperatura", y="Nubosidad", data=data, hue="Nombre", palette="tab10")
-        plt.xlabel("Temperatura (°C)")
-        plt.ylabel("Nubosidad (%)")
-        st.pyplot(fig)
-
-    else:
-        st.error("No se pudo obtener datos para estadísticas.")
-
-# Si se elige opción de 'Descargar datos'..
-if action == "Descargar datos":
-    st.download_button("Descargar datos de la API", data=str(response),
-                       file_name="datos_climaticos.csv")
+        # 10. **Distribución de Velocidad del Viento**
+        st.subheader("Distribución de Velocidad del Viento")
+        viento = data[['Nombre', 'Velocidad_Viento']].sort_values(by='Velocidad_Viento', ascending=False)
+        st.bar_chart(viento.set_index('Nombre')['Velocidad_Viento'])
