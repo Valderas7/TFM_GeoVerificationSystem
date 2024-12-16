@@ -24,8 +24,8 @@ RUN apt-get update && pip install --no-cache-dir streamlit==1.40.2 \
 # Se expone el puerto 80 ya que será en éste donde se servirá la aplicación
 EXPOSE 80
 
-# Comprobación de funcionamiento en el localhost de la imagen en el puerto 8501
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+# Comprobación de funcionamiento en el localhost de la imagen en el puerto 80
+HEALTHCHECK CMD curl --fail http://localhost:80/_stcore/health
 
 # Se ejecuta la APP de streamlit con el código copiado en la imagen
 # especificando la IP (127.0.0.1) y el puerto (80) donde se servirá
