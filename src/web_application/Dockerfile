@@ -13,6 +13,8 @@ COPY utils/ ./utils/
 # Se actualiza el sistema y se instalan las dependencias de la aplicación web
 RUN apt-get update && pip install --no-cache-dir streamlit==1.40.2 \
     requests==2.32.3 \
+    pycountry==24.6.1 \
+    pandas==2.2.3 \
     leafmap==0.40.1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

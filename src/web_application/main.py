@@ -1,5 +1,7 @@
 # Librerías
 import streamlit as st
+import pandas as pd
+import altair as alt
 import requests
 import leafmap.foliumap as leafmap
 import folium
@@ -176,7 +178,8 @@ if action == "Consultar provincia específica":
 
     # Se introduce un 'widget' de selección de provincia
     provincia = st.selectbox(label="Selecciona el nombre de la provincia:",
-                             options=provinces_list)
+                             options=provinces_list, index=None,
+                             placeholder="Elige una provincia")
 
     # Cuando se introduce una provincia...
     if provincia:
@@ -237,35 +240,71 @@ if action == "Estadísticas":
         "Generales </h2>", unsafe_allow_html=True
     )
 
-    # Realiza la solicitud GET a /clima
-    response = requests.get(f"{api_gateway_url}/clima").json()
+    # Se intenta ejecutar el siguiente bloque de código...
+    try:
 
-    # Si existe la clave 'data' en la respuesta...
-    if 'data' in response:
+        # Se realiza la solicitud 'GET /clima' y obtener el JSON de
+        # respuesta de todas las provincias
+        response = requests.get(f"{api_gateway_url}/clima").json()
+    
+    # Si hay excepción con la solicitud a la API...
+    except requests.RequestException:
+        
+        # Se indica un mensaje de error de Streamlit
+        st.error("No se pudo conectar con la API. Intentalo más tarde.")
+        st.stop()
 
-        # Se almacena en 'response_list'
-        response_list = response['data']
+    # Si la clave 'data' existe en la respuesta
+    if "data" in response:
+        
+        # Se almacena dicha clave en 'response_list'
+        response_list = response["data"]
 
-        # Extraer datos para las estadísticas
-        temperaturas = [float(prov['Temperatura']) for prov in response_list]
-        humedad = [float(prov['Humedad']) for prov in response_list]
-        provincias = [prov['Nombre'] for prov in response_list]
+        # Se crea un dataframe para facilitar el manejo de datos
+        data = pd.DataFrame(response_list)
+
+        # Convertir columnas relevantes a numéricas
+        data["Temperatura"] = pd.to_numeric(data["Temperatura"], errors="coerce")
+        data["Humedad"] = pd.to_numeric(data["Humedad"], errors="coerce")
+        data = data.dropna(subset=["Temperatura", "Humedad"])
 
         # Mostrar gráficos
-        st.bar_chart({"Provincias": provincias, "Temperatura": temperaturas})
-        st.line_chart({"Provincias": provincias, "Humedad": humedad})
+        st.markdown("### Temperaturas por provincia")
+        temp_chart = (
+            alt.Chart(data)
+            .mark_bar()
+            .encode(
+                x=alt.X("Nombre:N", sort="-y", title="Provincias"),
+                y=alt.Y("Temperatura:Q", title="Temperatura (°C)"),
+                tooltip=["Nombre", "Temperatura"],
+            )
+            .properties(width=800, height=400)
+        )
+        st.altair_chart(temp_chart)
 
-        # Mostrar máximos y mínimos
-        max_temp = max(response_list, key=lambda x: float(x['Temperatura']))
-        min_temp = min(response_list, key=lambda x: float(x['Temperatura']))
-        st.write(
-            f"Provincia más cálida: {max_temp['Nombre']} "
-            f"({max_temp['Temperatura']} °C)"
+        st.markdown("### Humedad por provincia")
+        humidity_chart = (
+            alt.Chart(data)
+            .mark_line(point=True)
+            .encode(
+                x=alt.X("Nombre:N", sort="-y", title="Provincias"),
+                y=alt.Y("Humedad:Q", title="Humedad (%)"),
+                tooltip=["Nombre", "Humedad"],
+            )
+            .properties(width=800, height=400)
         )
-        st.write(
-            f"Provincia más fría: {min_temp['Nombre']} "
-            f"({min_temp['Temperatura']} °C)"
-        )
+        st.altair_chart(humidity_chart)
+
+        # Calcular máximos y mínimos
+        max_temp = data.loc[data["Temperatura"].idxmax()]
+        min_temp = data.loc[data["Temperatura"].idxmin()]
+        avg_temp = data["Temperatura"].mean()
+
+        st.markdown("### Estadísticas generales")
+        st.write(f"**Provincia más cálida:** {max_temp['Nombre']} ({max_temp['Temperatura']} °C)")
+        st.write(f"**Provincia más fría:** {min_temp['Nombre']} ({min_temp['Temperatura']} °C)")
+        st.write(f"**Temperatura media en España:** {avg_temp:.2f} °C")
+
     else:
         st.error("No se pudo obtener datos para estadísticas.")
 
