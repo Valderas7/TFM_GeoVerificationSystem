@@ -54,6 +54,7 @@ resource "aws_ecs_service" "web_application_service" {
   task_definition = "${aws_ecs_task_definition.web_application_task.family}:${aws_ecs_task_definition.web_application_task.revision}"
   desired_count   = var.instances_number
   launch_type     = "FARGATE"
+  force_new_deployment = true
 
   network_configuration {
     assign_public_ip = true
