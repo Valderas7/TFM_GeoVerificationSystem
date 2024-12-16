@@ -21,8 +21,8 @@ RUN apt-get update && pip install --no-cache-dir streamlit==1.40.2 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Se expone el puerto 8501 ya que será en éste donde se servirá la aplicación
-EXPOSE 8501
+# Se expone el puerto 80 ya que será en éste donde se servirá la aplicación
+EXPOSE 80
 
 # Comprobación de funcionamiento en el localhost de la imagen en el puerto 8501
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health

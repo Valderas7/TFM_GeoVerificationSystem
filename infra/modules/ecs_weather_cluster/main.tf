@@ -10,7 +10,8 @@ resource "aws_ecs_cluster" "web_application_cluster" {
 
 # Recurso para crear una definición de tarea y así especificar como ejecutar
 # un contenedor en ECS. Se va a ejecutar con Fargate con un modo de red
-# 'awsvpc' (necesario para Fargate)
+# 'awsvpc' (necesario para Fargate), por lo que el puerto del contenedor y del
+# 'host' (ECS) debe ser el mismo
 resource "aws_ecs_task_definition" "web_application_task" {
   family                   = var.task_definition_name
   execution_role_arn       = var.role_iam
@@ -29,7 +30,6 @@ resource "aws_ecs_task_definition" "web_application_task" {
       portMappings = [
         {
           containerPort = var.container_port
-          hostPort      = var.host_port
           protocol      = "tcp"
         }
       ]

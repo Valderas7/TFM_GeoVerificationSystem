@@ -57,13 +57,6 @@ variable "container_name" {
 # Variable para el puerto del contenedor
 variable "container_port" {
   type    = number
-  default = 8501
-}
-
-
-# Variable para el puerto del host
-variable "host_port" {
-  type    = number
   default = 80
 }
 
