@@ -301,8 +301,7 @@ if action == "Estadísticas":
 
         # 1. Promedios generales de todas las variables numéricas
         st.markdown("<h4 style='text-align: center; color: black;'> Promedios"
-                    " Generales </h4>", unsafe_allow_html=True
-        )
+                    " Generales </h4>", unsafe_allow_html=True)
 
         st.markdown("En esta tabla se presentan los promedios de los datos "
                     "correspondientes a todas las provincias y ciudades "
@@ -320,28 +319,66 @@ if action == "Estadísticas":
             pd.DataFrame(promedios).reset_index()
             .rename(columns={"index": "Dato", 0: "Promedio"}))
 
+        # Se almacena un diccionario para añadir las unidades a los promedios
+        unidades = {
+            'Temperatura': 'ºC',
+            'Humedad': '%',
+            'Velocidad_Viento': 'm/s',
+            'Presion_Atmosferica': 'hPa',
+            'Nubosidad': '%',
+            'Precipitaciones': 'mm/h',
+            'Nevadas': 'mm/h'
+        }
+
+        # Con la función 'apply' se añaden las unidades a los promedios
+        promedios_df['Promedio'] = promedios_df.apply(
+            lambda row: f"{row['Promedio']} {unidades.get(row['Dato'], '')}",
+            axis=1)
+
         # Se convierte el dataframe a HTML
         html_table = promedios_df.to_html(index=False)
 
         # Se centra el dataframe con HTML usando CSS
         st.markdown(f'<div style="display: flex; justify-content: '
                     f'center;">{html_table}</div>', unsafe_allow_html=True)
-        
+
         # Para crear espacio
         st.text("")
 
-        # 2. **Máximos y Mínimos**
-        st.subheader("Máximos y Mínimos de Temperatura")
-        max_temp = data.loc[data['Temperatura'].idxmax()]
-        min_temp = data.loc[data['Temperatura'].idxmin()]
+        # 2. Distribución de Temperaturas
+        st.markdown("<h4 style='text-align: center; color: black;'> Distri"
+                    "bución de Temperaturas </h4>", unsafe_allow_html=True)
+        
+        st.markdown("El gráfico muestra la distribución de las temperaturas "
+                    "registradas en las distintas provincias y ciudades "
+                    "autónomas de España. Las barras representan los valores "
+                    "de temperatura. Esta visualización facilita la "
+                    "comparación entre regiones y proporciona una visión "
+                    "general de las diferencias térmicas a nivel nacional.")
+        
+        # Se crea una figura con seaborn
+        figure = plt.figure(figsize=(12, 6))
 
-        st.write(f"Provincia más cálida: {max_temp['Nombre']} ({max_temp['Temperatura']} °C)")
-        st.write(f"Provincia más fría: {min_temp['Nombre']} ({min_temp['Temperatura']} °C)")
+        # Se dibuja el diagrama de barras con los nombres de las provincias
+        # en el Eje X y las temperaturas en el Eje Y, coloreando las barras
+        # más rojas o más azules según haya más o menos temperatura
+        sns.barplot(
+            x='Nombre', 
+            y='Temperatura', 
+            data=data[['Nombre', 'Temperatura']],
+            palette='coolwarm',
+            hue='Temperatura',
+            legend=False
+        )
 
-        # 3. **Distribución de Temperaturas**
-        st.subheader("Distribución de Temperaturas")
-        temperaturas = data[['Nombre', 'Temperatura']].sort_values(by='Temperatura', ascending=False)
-        st.bar_chart(temperaturas.set_index('Nombre')['Temperatura'])
+        # Se rota 90º los nombres de las provincias y se ponen las etiquetas
+        # en el Eje X y en el Eje Y
+        plt.xticks(rotation=90)
+        plt.xlabel("Nombre", fontsize=12)
+        plt.ylabel("Temperatura", fontsize=12)
+
+        # Se muestra el gráfico de seaborn en Streamlit
+        st.pyplot(figure)
 
         # 4. **Distribución de Humedad**
         st.subheader("Distribución de Humedad")
