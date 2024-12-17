@@ -242,9 +242,19 @@ if action == "Estadísticas":
     )
 
     # Descripción de lo que realiza la aplicación web
-    st.markdown("En esta sección se muestran estadísticas a partir de la "
-                "información climática recopilada para cada una de las "
-                "provincias.")
+    st.markdown("En esta sección se presentan estadísticas basadas en la "
+                "información recopilada de cada una de las provincias. Con "
+                "el objetivo de facilitar la comprensión de los "
+                "datos, se generarán gráficos y/o tablas que visualizan "
+                "estos resultados de manera clara y concisa.")
+
+    st.markdown("Estas representaciones visuales permiten observar patrones, "
+                "tendencias y comparaciones entre las distintas provincias "
+                "proporcionando una visión más accesible y comprensible de "
+                "la información.")
+
+    # Para crear espacio
+    st.text("")
 
     # Se intenta ejecutar el siguiente bloque de código...
     try:
@@ -283,16 +293,42 @@ if action == "Estadísticas":
             "Nubosidad",
         ]
 
-        # Para cada columna...
+        # Para cada columna numérica...
         for col in columns_float:
 
-            # Se convierten los valores a tipo 'float'
+            # Se convierten los valores del 'dataframe' a tipo 'float'
             data[col] = data[col].astype(float)
 
-        # 1. **Promedios Generales**
-        st.subheader("Promedios Generales")
+        # 1. Promedios generales de todas las variables numéricas
+        st.markdown("<h4 style='text-align: center; color: black;'> Promedios"
+                    " Generales </h4>", unsafe_allow_html=True
+        )
+
+        st.markdown("En esta tabla se presentan los promedios de los datos "
+                    "correspondientes a todas las provincias y ciudades "
+                    "autónomas de España, incluyendo variables como "
+                    "temperatura, humedad, viento, presión atmosférica, "
+                    "nubosidad, precipitaciones y nevadas.")
+
+        # Se calcula la media de todas las columnas numéricas, redondeándolas
+        # a dos decimales
         promedios = data[columns_float].mean().round(2)
-        st.write(promedios)
+
+        # Se resetea el índice de la serie de pandas, convirtiéndola en
+        # dataframe. Posteriormente se renombran las columnas del dataframe
+        promedios_df = (
+            pd.DataFrame(promedios).reset_index()
+            .rename(columns={"index": "Dato", 0: "Promedio"}))
+
+        # Se convierte el dataframe a HTML
+        html_table = promedios_df.to_html(index=False)
+
+        # Se centra el dataframe con HTML usando CSS
+        st.markdown(f'<div style="display: flex; justify-content: '
+                    f'center;">{html_table}</div>', unsafe_allow_html=True)
+        
+        # Para crear espacio
+        st.text("")
 
         # 2. **Máximos y Mínimos**
         st.subheader("Máximos y Mínimos de Temperatura")
