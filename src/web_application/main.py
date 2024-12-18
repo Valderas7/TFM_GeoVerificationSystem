@@ -384,12 +384,11 @@ if action == "Estadísticas":
         # Para crear espacio
         st.text("")
 
+        # 2.1. Provincias con las 10 temperaturas más altas/bajas
         st.markdown("<h6 style='text-align: center; color: black;'> Provi"
-                    "ncias con las 10 temperaturas más altas/bajas </h6>",
+                    "ncias con las temperaturas más altas/bajas </h6>",
                     unsafe_allow_html=True)
 
-        # 2.1. Provincias con las 10 temperaturas más altas y Provincias con
-        # las 10 temperaturas más bajas
         st.markdown("Una vez visto el panorama general de las temperaturas "
                     "de todas las provincias, se muestran de todas ellas las "
                     "más extremas. Así, la gráfica de la izquierda muestra "
@@ -494,9 +493,77 @@ if action == "Estadísticas":
 
         # Se crea espacio
         st.text("")
+
+        # 3.1. Provincias con los porcentajes de humedad más altos/bajos
+        st.markdown("<h6 style='text-align: center; color: black;'> Provi"
+                    "ncias con los porcentajes más altos/bajos de humedad"
+                    "</h6>", unsafe_allow_html=True)
+
+        st.markdown("Una vez visto el panorama general, se muestran los "
+                    "porcentajes de humedad más extremos como en el caso de "
+                    "la temperatura. Así, la gráfica de la izquierda muestra "
+                    "las diez provincias con las humedades más altas, "
+                    "mientras que la gráfica de la derecha representa las "
+                    "diez provincias con las humedades más bajas.")
+
+        # Se crean dos columnas con Streamlit
+        col1, col2 = st.columns(2)
+
+        # Para la columna de la izquierda...
+        with col1:
+
+            # Se calcula en el dataframe las filas con los 10 valores más
+            # altos de humedad
+            humidity_top = data.nlargest(n=10, columns='Humedad')
+
+            # Se crea una figura
+            plt.figure(figsize=(6, 4))
+
+            # Se dibuja un diagrama de barras con las provincias en el Eje X y
+            # las temperaturas en el Eje Y, coloreando las barras con más
+            # intensidad si tienen mayor temperatura
+            sns.barplot(x='Nombre', y='Humedad', data=humidity_top,
+                        palette='Blues_r')
+
+            # Se personaliza el diagrama con etiquetas y rotación de las del
+            # Eje X
+            plt.xticks(rotation=45)
+            plt.xlabel("Provincias")
+            plt.ylabel("Humedad (%)")
+
+            # Se muestra la figura en Streamlit
+            st.pyplot(plt, use_container_width=True)
+
+        # Para la columna de la derecha...
+        with col2:
+
+            # Se calcula en el dataframe las filas con los 10 valores más
+            # bajos de humedad
+            humidity_down = data.nsmallest(n=10, columns='Humedad')
+
+            # Se crea una figura
+            plt.figure(figsize=(6, 4))
+
+            # Se dibuja un diagrama de barras con las provincias en el Eje X y
+            # las temperaturas en el Eje Y, coloreando las barras con más
+            # intensidad si tienen menor temperatura
+            sns.barplot(x='Nombre', y='Humedad', data=humidity_down,
+                        palette=["#b3cde0"])
+
+            # Se personaliza el diagrama con etiquetas y rotación de las del
+            # Eje X
+            plt.xticks(rotation=45)
+            plt.xlabel("Provincias")
+            plt.ylabel("Humedad (%)")
+
+            # Se muestra la figura en Streamlit
+            st.pyplot(plt, use_container_width=True)
+
+        # Para crear espacio
+        st.text("")
         st.text("")
 
-        # 5. **Frecuencia de Condiciones Climáticas**
+        # 4. Frecuencia de Condiciones Climáticas
         st.subheader("Frecuencia de Condiciones Climáticas")
         clima_counts = data['Clima'].value_counts()
         st.bar_chart(clima_counts)
