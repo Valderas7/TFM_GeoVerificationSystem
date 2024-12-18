@@ -348,14 +348,14 @@ if action == "Estadísticas":
         # 2. Distribución de Temperaturas
         st.markdown("<h4 style='text-align: center; color: black;'> Distri"
                     "bución de Temperaturas </h4>", unsafe_allow_html=True)
-        
+
         st.markdown("El gráfico muestra la distribución de las temperaturas "
                     "registradas en las distintas provincias y ciudades "
                     "autónomas de España. Las barras representan los valores "
                     "de temperatura. Esta visualización facilita la "
                     "comparación entre regiones y proporciona una visión "
                     "general de las diferencias térmicas a nivel nacional.")
-        
+
         # Se crea una figura con seaborn
         figure = plt.figure(figsize=(12, 6))
 
@@ -363,8 +363,8 @@ if action == "Estadísticas":
         # en el Eje X y las temperaturas en el Eje Y, coloreando las barras
         # más rojas o más azules según haya más o menos temperatura
         sns.barplot(
-            x='Nombre', 
-            y='Temperatura', 
+            x='Nombre',
+            y='Temperatura',
             data=data[['Nombre', 'Temperatura']],
             palette='coolwarm',
             hue='Temperatura',
@@ -395,7 +395,7 @@ if action == "Estadísticas":
                     "las diez provincias con las temperaturas más altas de "
                     "España, mientras que la gráfica de la derecha representa"
                     " las diez provincias con las temperaturas más bajas.")
-        
+
         # Se crean dos columnas con Streamlit
         col1, col2 = st.columns(2)
 
@@ -412,9 +412,11 @@ if action == "Estadísticas":
             # Se dibuja un diagrama de barras con las provincias en el Eje X y
             # las temperaturas en el Eje Y, coloreando las barras con más
             # intensidad si tienen mayor temperatura
-            sns.barplot(x='Nombre', y='Temperatura', data=hottest, palette='Reds_r')
+            sns.barplot(x='Nombre', y='Temperatura', data=hottest,
+                        palette='Reds_r')
 
-            # Se personaliza el diagrama con etiquetas y rotación de las del Eje X
+            # Se personaliza el diagrama con etiquetas y rotación de las del
+            # Eje X
             plt.xticks(rotation=90)
             plt.xlabel("Provincias")
             plt.ylabel("Temperatura (°C)")
@@ -435,9 +437,11 @@ if action == "Estadísticas":
             # Se dibuja un diagrama de barras con las provincias en el Eje X y
             # las temperaturas en el Eje Y, coloreando las barras con más
             # intensidad si tienen menor temperatura
-            sns.barplot(x='Nombre', y='Temperatura', data=coldest, palette='Blues_r')
+            sns.barplot(x='Nombre', y='Temperatura', data=coldest,
+                        palette='Blues_r')
 
-            # Se personaliza el diagrama con etiquetas y rotación de las del Eje X
+            # Se personaliza el diagrama con etiquetas y rotación de las del
+            # Eje X
             plt.xticks(rotation=45)
             plt.xlabel("Provincias")
             plt.ylabel("Temperatura (°C)")
@@ -448,7 +452,7 @@ if action == "Estadísticas":
         # Para crear espacio
         st.text("")
 
-        # 3. **Distribución de Humedad**
+        # 3. Distribución de Humedad
         st.subheader("Distribución de Humedad")
         humedad = data[['Nombre', 'Humedad']].sort_values(by='Humedad', ascending=False)
         st.bar_chart(humedad.set_index('Nombre')['Humedad'])
