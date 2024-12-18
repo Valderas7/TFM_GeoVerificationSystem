@@ -344,13 +344,14 @@ if action == "Estadísticas":
 
         # Para crear espacio
         st.text("")
+        st.text("")
 
         # 2. Distribución de Temperaturas
         st.markdown("<h4 style='text-align: center; color: black;'> Distri"
                     "bución de Temperaturas </h4>", unsafe_allow_html=True)
 
-        st.markdown("El gráfico muestra la distribución de las temperaturas "
-                    "registradas en las distintas provincias y ciudades "
+        st.markdown("Este gráfico muestra la distribución de las temperaturas"
+                    " registradas en las distintas provincias y ciudades "
                     "autónomas de España. Las barras representan los valores "
                     "de temperatura. Esta visualización facilita la "
                     "comparación entre regiones y proporciona una visión "
@@ -365,7 +366,7 @@ if action == "Estadísticas":
         sns.barplot(
             x='Nombre',
             y='Temperatura',
-            data=data[['Nombre', 'Temperatura']],
+            data=data[['Nombre', 'Temperatura']].sort_values(by='Nombre'),
             palette='coolwarm',
             hue='Temperatura',
             legend=False
@@ -451,11 +452,49 @@ if action == "Estadísticas":
 
         # Para crear espacio
         st.text("")
+        st.text("")
 
         # 3. Distribución de Humedad
-        st.subheader("Distribución de Humedad")
-        humedad = data[['Nombre', 'Humedad']].sort_values(by='Humedad', ascending=False)
-        st.bar_chart(humedad.set_index('Nombre')['Humedad'])
+        st.markdown("<h4 style='text-align: center; color: black;'> Distri"
+                    "bución de Humedad </h4>", unsafe_allow_html=True)
+
+        st.markdown("El siguiente gráfico presenta la distribución del "
+                    "porcentaje de humedad registrado en todas las provincias"
+                     " y ciudades autónomas de España. Este análisis permite "
+                     "comparar los niveles de humedad entre las diferentes "
+                     "regiones, destacando las provincias con los valores más "
+                     "altos y más bajos. La humedad es un indicador clave del "
+                     "clima local, y su visualización proporciona una "
+                     "perspectiva clara de las condiciones atmosféricas en el "
+                     "territorio nacional.")
+
+        # Se crea una figura con seaborn
+        figure = plt.figure(figsize=(14, 6))
+
+        # Se dibuja el diagrama de barras con los nombres de las provincias
+        # en el Eje X y los porcentajes en el Eje Y, coloreando las barras
+        # cada vez más azules según haya más humedad
+        sns.barplot(
+            x='Nombre',
+            y='Humedad',
+            data=data[['Nombre', 'Humedad']].sort_values(by='Nombre'),
+            palette='Blues',
+            hue='Humedad',
+            legend=False,
+        )
+
+        # Se rota 90º los nombres de las provincias y se ponen las etiquetas
+        # en el Eje X y en el Eje Y
+        plt.xticks(rotation=90)
+        plt.xlabel("Provincias", fontsize=12)
+        plt.ylabel("Humedad (%)", fontsize=12)
+
+        # Se muestra el gráfico de seaborn en Streamlit
+        st.pyplot(figure, use_container_width=True)
+
+        # Se crea espacio
+        st.text("")
+        st.text("")
 
         # 5. **Frecuencia de Condiciones Climáticas**
         st.subheader("Frecuencia de Condiciones Climáticas")
