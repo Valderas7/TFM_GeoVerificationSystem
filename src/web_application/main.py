@@ -374,13 +374,81 @@ if action == "Estadísticas":
         # Se rota 90º los nombres de las provincias y se ponen las etiquetas
         # en el Eje X y en el Eje Y
         plt.xticks(rotation=90)
-        plt.xlabel("Nombre", fontsize=12)
-        plt.ylabel("Temperatura", fontsize=12)
+        plt.xlabel("Provincias", fontsize=12)
+        plt.ylabel("Temperatura (°C)", fontsize=12)
 
         # Se muestra el gráfico de seaborn en Streamlit
-        st.pyplot(figure)
+        st.pyplot(figure, use_container_width=True)
 
-        # 4. **Distribución de Humedad**
+        # Para crear espacio
+        st.text("")
+
+        st.markdown("<h6 style='text-align: center; color: black;'> Provi"
+                    "ncias con las 10 temperaturas más altas/bajas </h6>",
+                    unsafe_allow_html=True)
+
+        # 2.1. Provincias con las 10 temperaturas más altas y Provincias con
+        # las 10 temperaturas más bajas
+        st.markdown("Una vez visto el panorama general de las temperaturas "
+                    "de todas las provincias, se muestran de todas ellas las "
+                    "más extremas. Así, la gráfica de la izquierda muestra "
+                    "las diez provincias con las temperaturas más altas de "
+                    "España, mientras que la gráfica de la derecha representa"
+                    " las diez provincias con las temperaturas más bajas.")
+        
+        # Se crean dos columnas con Streamlit
+        col1, col2 = st.columns(2)
+
+        # Para la columna de la izquierda...
+        with col1:
+
+            # Se calcula en el dataframe las filas con los 10 valores más
+            # altos de temperatura
+            hottest = data.nlargest(n=10, columns='Temperatura')
+
+            # Se crea una figura
+            plt.figure(figsize=(6, 4))
+
+            # Se dibuja un diagrama de barras con las provincias en el Eje X y
+            # las temperaturas en el Eje Y, coloreando las barras con más
+            # intensidad si tienen mayor temperatura
+            sns.barplot(x='Nombre', y='Temperatura', data=hottest, palette='Reds_r')
+
+            # Se personaliza el diagrama con etiquetas y rotación de las del Eje X
+            plt.xticks(rotation=90)
+            plt.xlabel("Provincias")
+            plt.ylabel("Temperatura (°C)")
+
+            # Se muestra la figura en Streamlit
+            st.pyplot(plt, use_container_width=True)
+
+        # Para la columna de la derecha...
+        with col2:
+
+            # Se calcula en el dataframe las filas con los 10 valores más
+            # bajos de temperatura
+            coldest = data.nsmallest(n=10, columns='Temperatura')
+
+            # Se crea una figura
+            plt.figure(figsize=(6, 4))
+
+            # Se dibuja un diagrama de barras con las provincias en el Eje X y
+            # las temperaturas en el Eje Y, coloreando las barras con más
+            # intensidad si tienen menor temperatura
+            sns.barplot(x='Nombre', y='Temperatura', data=coldest, palette='Blues_r')
+
+            # Se personaliza el diagrama con etiquetas y rotación de las del Eje X
+            plt.xticks(rotation=45)
+            plt.xlabel("Provincias")
+            plt.ylabel("Temperatura (°C)")
+
+            # Se muestra la figura en Streamlit
+            st.pyplot(plt, use_container_width=True)
+
+        # Para crear espacio
+        st.text("")
+
+        # 3. **Distribución de Humedad**
         st.subheader("Distribución de Humedad")
         humedad = data[['Nombre', 'Humedad']].sort_values(by='Humedad', ascending=False)
         st.bar_chart(humedad.set_index('Nombre')['Humedad'])
@@ -394,16 +462,6 @@ if action == "Estadísticas":
         st.subheader("Precipitaciones Totales")
         precipitaciones = data[['Nombre', 'Precipitaciones']].sort_values(by='Precipitaciones', ascending=False)
         st.bar_chart(precipitaciones.set_index('Nombre')['Precipitaciones'])
-
-        # 7. **Top 10 Más Calientes**
-        st.subheader("Top 10 Más Calientes")
-        top_10_calientes = data[['Nombre', 'Temperatura']].sort_values(by='Temperatura', ascending=False).head(10)
-        st.bar_chart(top_10_calientes.set_index('Nombre')['Temperatura'])
-
-        # 8. **Top 10 Más Frías**
-        st.subheader("Top 10 Más Frías")
-        top_10_frias = data[['Nombre', 'Temperatura']].sort_values(by='Temperatura', ascending=True).head(10)
-        st.bar_chart(top_10_frias.set_index('Nombre')['Temperatura'])
 
         # 9. **Correlación entre Variables**
         st.subheader("Matriz de Correlación")
