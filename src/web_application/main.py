@@ -375,8 +375,8 @@ if action == "Estadísticas":
         # Se rota 90º los nombres de las provincias y se ponen las etiquetas
         # en el Eje X y en el Eje Y
         plt.xticks(rotation=90)
-        plt.xlabel("Provincias", fontsize=12)
-        plt.ylabel("Temperatura (°C)", fontsize=12)
+        plt.xlabel("Provincias", labelpad=12)
+        plt.ylabel("Temperatura (°C)", labelpad=12)
 
         # Se muestra el gráfico de seaborn en Streamlit
         st.pyplot(figure, use_container_width=True)
@@ -459,13 +459,13 @@ if action == "Estadísticas":
 
         st.markdown("El siguiente gráfico presenta la distribución del "
                     "porcentaje de humedad registrado en todas las provincias"
-                     " y ciudades autónomas de España. Este análisis permite "
-                     "comparar los niveles de humedad entre las diferentes "
-                     "regiones, destacando las provincias con los valores más "
-                     "altos y más bajos. La humedad es un indicador clave del "
-                     "clima local, y su visualización proporciona una "
-                     "perspectiva clara de las condiciones atmosféricas en el "
-                     "territorio nacional.")
+                    " y ciudades autónomas de España. Este análisis permite "
+                    "comparar los niveles de humedad entre las diferentes "
+                    "regiones, destacando las provincias con los valores más "
+                    "altos y más bajos. La humedad es un indicador clave del "
+                    "clima local, y su visualización proporciona una "
+                    "perspectiva clara de las condiciones atmosféricas en el "
+                    "territorio nacional.")
 
         # Se crea una figura con seaborn
         figure = plt.figure(figsize=(14, 6))
@@ -563,10 +563,61 @@ if action == "Estadísticas":
         st.text("")
         st.text("")
 
-        # 4. Frecuencia de Condiciones Climáticas
-        st.subheader("Frecuencia de Condiciones Climáticas")
-        clima_counts = data['Clima'].value_counts()
-        st.bar_chart(clima_counts)
+        # 4. Condiciones Climáticas
+        st.markdown("<h4 style='text-align: center; color: black;'> Condicion"
+                    "es Climáticas </h4>", unsafe_allow_html=True)
+
+        st.markdown("El siguiente gráfico presenta la distribución de las "
+                    "condiciones climáticas. Cada barra representa una "
+                    "categoría climática indicando su proporción respecto "
+                    "al total de registros. Esta visualización facilita "
+                    "identificar de forma intuitiva cuáles son las "
+                    "condiciones más frecuentes y menos comunes, dando una "
+                    "perspectiva clara de la predominancia de cada tipo de "
+                    "clima en España.")
+
+        # Se crea una figura con seaborn
+        figure = plt.figure(figsize=(14, 6))
+
+        # Se cuentan los valores de la columna 'Clima' normalizandolos en
+        # porcentajes, y posteriormente se resetea el índice de la serie
+        # resultante para convertirla a dataframe
+        percent_df = (
+            (data['Clima'].value_counts(normalize=True) * 100).reset_index()
+        )
+
+        # Se dibuja el diagrama de barras con los nombres de las provincias
+        # en el Eje X y los porcentajes en el Eje Y, coloreando las barras
+        # cada vez más azules según haya más humedad
+        sns.barplot(
+            data=percent_df,
+            x=percent_df['proportion'],
+            y=percent_df['Clima'],
+            palette='YlGnBu'
+        )
+
+        # Para cada índice y fila de 'percent_df'...
+        for index, row in percent_df.iterrows():
+
+            # Se escribe en texto el porcentaje de cada barra sobre el gráfico
+            # en las posiciones del Eje X e Y indicadas
+            plt.text(x=row['proportion'] + 1.75,
+                     y=index,
+                     s=f"{row['proportion']:.1f}%",
+                     ha='center')
+
+        # Se rota 45 los nombres de los climas y se ponen las etiquetas
+        # en el Eje X y en el Eje Y
+        plt.yticks(rotation=45)
+        plt.xlabel("Porcentaje (%)", labelpad=25)
+        plt.ylabel("Clima", labelpad=15)
+
+        # Se muestra el gráfico de seaborn en Streamlit
+        st.pyplot(figure, use_container_width=True)
+
+        # Se crea espacio
+        st.text("")
+        st.text("")
 
         # 6. **Precipitaciones Totales**
         st.subheader("Precipitaciones Totales")
