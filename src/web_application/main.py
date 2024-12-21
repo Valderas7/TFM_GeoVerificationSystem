@@ -357,7 +357,7 @@ if action == "Estadísticas":
                     "comparación entre regiones y proporciona una visión "
                     "general de las diferencias térmicas a nivel nacional.")
 
-        # Se crea una figura con seaborn
+        # Se crea una figura con matplotlib
         figure = plt.figure(figsize=(12, 6))
 
         # Se dibuja el diagrama de barras con los nombres de las provincias
@@ -467,7 +467,7 @@ if action == "Estadísticas":
                     "perspectiva clara de las condiciones atmosféricas en el "
                     "territorio nacional.")
 
-        # Se crea una figura con seaborn
+        # Se crea una figura con matplotlib
         figure = plt.figure(figsize=(14, 6))
 
         # Se dibuja el diagrama de barras con los nombres de las provincias
@@ -576,7 +576,7 @@ if action == "Estadísticas":
                     "perspectiva clara de la predominancia de cada tipo de "
                     "clima en España.")
 
-        # Se crea una figura con seaborn
+        # Se crea una figura con matplotlib
         figure = plt.figure(figsize=(14, 6))
 
         # Se cuentan los valores de la columna 'Clima' normalizandolos en
@@ -644,7 +644,7 @@ if action == "Estadísticas":
         # Si se encuentran provincias con precipitaciones...
         if len(df_precipitaciones) > 0:
 
-            # Se crea una figura con seaborn
+            # Se crea una figura con matplotlib
             figure = plt.figure(figsize=(14, 6))
 
             # A este nuevo dataframe, se le crea una columna 'Acumulado' que
@@ -711,36 +711,31 @@ if action == "Estadísticas":
         st.markdown("<h4 style='text-align: center; color: black;'> Velocidad"
                     " del Viento </h4>", unsafe_allow_html=True)
 
-        st.markdown("Esta visualización presenta la distribución del "
-                    "porcentaje de humedad registrado en todas las provincias"
-                    " y ciudades autónomas de España. Este análisis permite "
-                    "comparar los niveles de humedad entre las diferentes "
-                    "regiones, destacando las provincias con los valores más "
-                    "altos y más bajos. La humedad es un indicador clave del "
-                    "clima local, y su visualización proporciona una "
-                    "perspectiva clara de las condiciones atmosféricas en el "
-                    "territorio nacional.")
+        st.markdown("Este histograma representa la distribución de la "
+                    "velocidad del viento. Cada barra del gráfico indica "
+                    "la frecuencia de velocidades que se encuentran dentro "
+                    "de un intervalo específico. El Eje X muestra los "
+                    "intervalos de velocidad, mientras que el Eje Y "
+                    "representa el número de veces que esas velocidades "
+                    "son registradas.")
 
-        # Se crea una figura con seaborn
+        # Se crea una figura con matplotlib
         figure = plt.figure(figsize=(14, 6))
 
         # Se dibuja el diagrama de barras con los nombres de las provincias
         # en el Eje X y los porcentajes en el Eje Y, coloreando las barras
         # cada vez más azules según haya más humedad
-        sns.barplot(
-            x='Nombre',
-            y='Humedad',
+        sns.histplot(
             data=data.sort_values(by='Nombre'),
-            palette='Blues',
-            hue='Humedad',
-            legend=False,
+            x='Velocidad_Viento',
+            bins=7,
         )
 
         # Se rota 90º los nombres de las provincias y se ponen las etiquetas
         # en el Eje X y en el Eje Y
         plt.xticks(rotation=90)
-        plt.xlabel("Provincias", fontsize=12)
-        plt.ylabel("Humedad (%)", fontsize=12)
+        plt.xlabel("Velocidad del Viento (m/s)", labelpad=12)
+        plt.ylabel("Frecuencia", labelpad=12)
 
         # Se muestra el gráfico de seaborn en Streamlit
         st.pyplot(figure, use_container_width=True)
@@ -750,8 +745,21 @@ if action == "Estadísticas":
         st.text("")
 
         # 7. Correlación entre Variables
-        st.subheader("Matriz de Correlación")
+        st.markdown("<h4 style='text-align: center; color: black;'> Matriz "
+                    "de Correlación </h4>", unsafe_allow_html=True)
+
+        st.markdown("Este gráfico muestra la correlación entre las distintas "
+                    "variables numéricas.")
+
+        # Se calcula la correlación entre todas las columnas numéricas del
+        # dataframe 'data'
         corr = data[columns_float].corr()
+
+        # Se crea una figura con matplotlib
         fig = plt.figure(figsize=(10, 8))
+
+        # Se dibuja un mapa de calor con las correlaciones calculadas
         sns.heatmap(corr, annot=True, cmap='coolwarm')
+
+        # Se muestra la figura en Streamlit
         st.pyplot(fig)
