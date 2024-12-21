@@ -366,7 +366,7 @@ if action == "Estadísticas":
         sns.barplot(
             x='Nombre',
             y='Temperatura',
-            data=data[['Nombre', 'Temperatura']].sort_values(by='Nombre'),
+            data=data.sort_values(by='Nombre'),
             palette='coolwarm',
             hue='Temperatura',
             legend=False
@@ -457,7 +457,7 @@ if action == "Estadísticas":
         st.markdown("<h4 style='text-align: center; color: black;'> Distri"
                     "bución de Humedad </h4>", unsafe_allow_html=True)
 
-        st.markdown("El siguiente gráfico presenta la distribución del "
+        st.markdown("Esta visualización presenta la distribución del "
                     "porcentaje de humedad registrado en todas las provincias"
                     " y ciudades autónomas de España. Este análisis permite "
                     "comparar los niveles de humedad entre las diferentes "
@@ -476,7 +476,7 @@ if action == "Estadísticas":
         sns.barplot(
             x='Nombre',
             y='Humedad',
-            data=data[['Nombre', 'Humedad']].sort_values(by='Nombre'),
+            data=data.sort_values(by='Nombre'),
             palette='Blues',
             hue='Humedad',
             legend=False,
@@ -586,9 +586,8 @@ if action == "Estadísticas":
             (data['Clima'].value_counts(normalize=True) * 100).reset_index()
         )
 
-        # Se dibuja el diagrama de barras con los nombres de las provincias
-        # en el Eje X y los porcentajes en el Eje Y, coloreando las barras
-        # cada vez más azules según haya más humedad
+        # Se dibuja el diagrama de barras con los nombres de los climas en
+        # el Eje Y y los porcentajes en el Eje X
         sns.barplot(
             data=percent_df,
             x=percent_df['proportion'],
@@ -601,7 +600,7 @@ if action == "Estadísticas":
 
             # Se escribe en texto el porcentaje de cada barra sobre el gráfico
             # en las posiciones del Eje X e Y indicadas
-            plt.text(x=row['proportion'] + 1.75,
+            plt.text(x=row['proportion'] + 1.25,
                      y=index,
                      s=f"{row['proportion']:.1f}%",
                      ha='center')
@@ -609,7 +608,7 @@ if action == "Estadísticas":
         # Se rota 45 los nombres de los climas y se ponen las etiquetas
         # en el Eje X y en el Eje Y
         plt.yticks(rotation=45)
-        plt.xlabel("Porcentaje (%)", labelpad=25)
+        plt.xlabel("Porcentaje", labelpad=25)
         plt.ylabel("Clima", labelpad=15)
 
         # Se muestra el gráfico de seaborn en Streamlit
@@ -619,19 +618,140 @@ if action == "Estadísticas":
         st.text("")
         st.text("")
 
-        # 6. **Precipitaciones Totales**
-        st.subheader("Precipitaciones Totales")
-        precipitaciones = data[['Nombre', 'Precipitaciones']].sort_values(by='Precipitaciones', ascending=False)
-        st.bar_chart(precipitaciones.set_index('Nombre')['Precipitaciones'])
+        # 5. Precipitaciones Totales
+        st.markdown("<h4 style='text-align: center; color: black;'> Precipita"
+                    "ciones </h4>", unsafe_allow_html=True)
 
-        # 9. **Correlación entre Variables**
+        st.markdown("La siguiente visualización representa la precipitación "
+                    "acumulada en las provincias de España donde se "
+                    "registraron precipitaciones. En el eje X se muestran las"
+                    " provincias ordenadas según sus precipitaciones "
+                    "individuales, mientras que el eje Y representa la "
+                    "cantidad acumulada de precipitación en milímetros/hora. "
+                    "\n\nEl área sombreada bajo la curva ayuda a visualizar "
+                    "la tendencia de acumulación. Además, sobre cada punto "
+                    "se anota la precipitación individual de la "
+                    "provincia correspondiente, lo que permite identificar "
+                    "la cantidad de lluvias en cada provincia.")
+
+        # Se crea un nuevo dataframe filtrando las provincias con
+        # precipitaciones, ordenándolas ascendentemente
+        df_precipitaciones = (
+            data.loc[data['Precipitaciones'] > 0]
+            .sort_values(by='Precipitaciones')
+        )
+
+        # Si se encuentran provincias con precipitaciones...
+        if len(df_precipitaciones) > 0:
+
+            # Se crea una figura con seaborn
+            figure = plt.figure(figsize=(14, 6))
+
+            # A este nuevo dataframe, se le crea una columna 'Acumulado' que
+            # va sumando acumulativamente las precipitaciones de cada
+            # provincia
+            df_precipitaciones["Acumulado"] = (
+                df_precipitaciones["Precipitaciones"].cumsum()
+            )
+
+            # Se dibuja un gráfico de lineas de las provincias con lluvias
+            # mostrando la lluvia acumulativa total
+            sns.lineplot(data=df_precipitaciones,
+                         x="Nombre",
+                         y='Acumulado',
+                         marker="o")
+
+            # Se rellena el área debajo del gráfico de línea con una
+            # transparencia de 0.2
+            plt.fill_between(x=df_precipitaciones["Nombre"],
+                             y1=df_precipitaciones["Acumulado"],
+                             alpha=0.2)
+
+            # Para cada índice y fila de 'df_precipitaciones'...
+            for index, row in df_precipitaciones.iterrows():
+
+                # Se escribe en texto la precipitación que hay en cada
+                # provincia indicando la posición del texto en el Eje X e Y
+                plt.text(x=row['Nombre'],
+                         y=row["Acumulado"] + 0.05,
+                         s=f"{row['Precipitaciones']}",
+                         ha='center')
+
+            # Etiquetas en los Ejes y rotación de 'ticks' en el Eje X
+            plt.ylabel("Precipitación Acumulada (mm/h)", labelpad=15)
+            plt.xlabel("Provincia", labelpad=15)
+            plt.xticks(rotation=45)
+
+        # Si no se encuentran provincias con precipitaciones...
+        else:
+
+            # Se crea un gráfico
+            figure, ax = plt.subplots(figsize=(8, 4))
+
+            # Se añade un texto para indicar que no hay datos de
+            # precipitaciones (alineado en el centro horizontal y
+            # verticalmente)
+            ax.text(x=0.5, y=0.5, s="Sin datos de precipitaciones",
+                    fontsize=14, ha="center", va="center")
+
+            # Se eliminan los 'ticks' del Eje X y Eje Y, además del rectángulo
+            # del gráfico
+            ax.set_xticks([])
+            ax.set_yticks([])
+            ax.set_frame_on(False)
+
+        # Se muestra el gráfico en Streamlit
+        st.pyplot(figure, use_container_width=True)
+
+        # Se crea espacio
+        st.text("")
+        st.text("")
+
+        # 6. Velocidad del Viento
+        st.markdown("<h4 style='text-align: center; color: black;'> Velocidad"
+                    " del Viento </h4>", unsafe_allow_html=True)
+
+        st.markdown("Esta visualización presenta la distribución del "
+                    "porcentaje de humedad registrado en todas las provincias"
+                    " y ciudades autónomas de España. Este análisis permite "
+                    "comparar los niveles de humedad entre las diferentes "
+                    "regiones, destacando las provincias con los valores más "
+                    "altos y más bajos. La humedad es un indicador clave del "
+                    "clima local, y su visualización proporciona una "
+                    "perspectiva clara de las condiciones atmosféricas en el "
+                    "territorio nacional.")
+
+        # Se crea una figura con seaborn
+        figure = plt.figure(figsize=(14, 6))
+
+        # Se dibuja el diagrama de barras con los nombres de las provincias
+        # en el Eje X y los porcentajes en el Eje Y, coloreando las barras
+        # cada vez más azules según haya más humedad
+        sns.barplot(
+            x='Nombre',
+            y='Humedad',
+            data=data.sort_values(by='Nombre'),
+            palette='Blues',
+            hue='Humedad',
+            legend=False,
+        )
+
+        # Se rota 90º los nombres de las provincias y se ponen las etiquetas
+        # en el Eje X y en el Eje Y
+        plt.xticks(rotation=90)
+        plt.xlabel("Provincias", fontsize=12)
+        plt.ylabel("Humedad (%)", fontsize=12)
+
+        # Se muestra el gráfico de seaborn en Streamlit
+        st.pyplot(figure, use_container_width=True)
+
+        # Se crea espacio
+        st.text("")
+        st.text("")
+
+        # 7. Correlación entre Variables
         st.subheader("Matriz de Correlación")
         corr = data[columns_float].corr()
         fig = plt.figure(figsize=(10, 8))
         sns.heatmap(corr, annot=True, cmap='coolwarm')
         st.pyplot(fig)
-
-        # 10. **Distribución de Velocidad del Viento**
-        st.subheader("Distribución de Velocidad del Viento")
-        viento = data[['Nombre', 'Velocidad_Viento']].sort_values(by='Velocidad_Viento', ascending=False)
-        st.bar_chart(viento.set_index('Nombre')['Velocidad_Viento'])
