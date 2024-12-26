@@ -10,8 +10,8 @@ on:
 # Trabajos que se ejecutan en el flujo de trabajo
 jobs:
 
-  # Nombre del trabajo nº1: Test
-  Test:
+  # Nombre del trabajo nº1: Linting
+  Linting:
 
     # Se ejecuta en una máquina con Ubuntu
     runs-on: ubuntu-24.04
@@ -29,17 +29,39 @@ jobs:
       with:
         python-version: '3.11'
 
-    # Paso nº3: Actualizar 'pip' e instalar dependencias
-    - name: Instalar dependencias
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r src/requirements.txt 
-
-    # Paso nº4: Ejecutar el linter Flake8
+    # Paso nº3: Ejecutar el linter Flake8
     - name: Analizar código (linting)
       run: |
         pip install flake8
-        flake8 src 
+        flake8 src
+  
+  # Nombre del trabajo nº2: Test_Unitarios
+  Test_Unitarios:
+
+    # Se ejecuta en una máquina con Ubuntu
+    runs-on: ubuntu-24.04
+
+    # El trabajo se ejecuta solo cuando termine el trabajo 'Linting'
+    needs: Linting
+
+    # Lista de pasos del trabajo
+    steps:
+
+    # Paso nº1: Acción 'checkout' para clonar el repositorio
+    - name: Clonar el repositorio
+      uses: actions/checkout@v3
+
+    # Paso nº2: Acción 'setup-python' para configurar Python 3.11
+    - name: Configurar Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    # Paso nº3: Actualizar 'pip' e instalar dependencias
+    #- name: Instalar dependencias
+      #run: |
+        #python -m pip install --upgrade pip
+        #pip install -r src/requirements.txt 
 
     # Paso nº5: Ejecutar los tests con Pytest
     #- name: Ejecutar tests unitarios y de integración
