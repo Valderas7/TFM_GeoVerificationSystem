@@ -748,18 +748,24 @@ if action == "Estadísticas":
         st.markdown("<h4 style='text-align: center; color: black;'> Matriz "
                     "de Correlación </h4>", unsafe_allow_html=True)
 
-        st.markdown("Este gráfico muestra la correlación entre las distintas "
-                    "variables numéricas.")
+        st.markdown("Por útimo, se muestra un gráfico que representa la "
+                    "correlación entre las distintas variables numéricas.")
 
         # Se calcula la correlación entre todas las columnas numéricas del
-        # dataframe 'data'
-        corr = data[columns_float].corr()
+        # dataframe 'data' que tienen algún dato válido (no cero)
+        columns_with_data = [col for col in columns_float if
+                             (data[col] != 0).sum() > 0]
+        corr = data[columns_with_data].corr()
 
         # Se crea una figura con matplotlib
         fig = plt.figure(figsize=(10, 8))
 
         # Se dibuja un mapa de calor con las correlaciones calculadas
-        sns.heatmap(corr, annot=True, cmap='coolwarm')
+        sns.heatmap(corr, annot=True, cmap='coolwarm', cbar=True,
+                    vmin=-1.0, vmax=1.0)
+
+        # Se rotan 45 grados los 'ticks'
+        plt.xticks(rotation=45)
 
         # Se muestra la figura en Streamlit
         st.pyplot(fig)
