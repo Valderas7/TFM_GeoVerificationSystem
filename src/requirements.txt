@@ -3,3 +3,4 @@ requests==2.32.3            # Para Lambda
 pycountry==24.6.1           # Para Lambda
 streamlit==1.40.2           # Para Streamlit
 leafmap==0.40.1             # Para Streamlit
+pytest==8.3.4               # Para tests unitarios
