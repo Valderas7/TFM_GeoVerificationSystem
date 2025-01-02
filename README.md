@@ -8,7 +8,7 @@ En este repositorio se recopila todo el código desarrollado para el Trabajo Fin
 - **.github**: Directorio donde se recopilan los `YAML` que se encargan de definir los flujos de `CI/CD` de `Github Actions`. En el proceso de integración continua se realiza `linting` del código de `Python` y en el proceso de despliegue continuo se ejecuta el aprovisionamiento de la infraestructura de `AWS` mediante `Terraform`.
 
 
--**img**: Carpeta para recopilar imágenes.
+- **img**: Carpeta para recopilar imágenes.
 
 
 - **infra**: En esta carpeta se recopilan todos los archivos de configuración de `Terraform` desarrollados con `HCL` y estructurados en módulos y los recursos como `layers` y códigos de las `Lambda` en `.zip`.
