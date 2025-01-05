@@ -4,6 +4,8 @@ En este repositorio se recopila todo el código desarrollado para el Trabajo Fin
 
 Se despliega toda una infraestructura en `AWS` para crear un sistema de verificación de datos geoespaciales:
 
+![Arquitectura](img/architecture.png)
+
 - Se crea una `Lambda` que realiza peticiones a una `API` de datos meteorológicos cada dos horas para procesarlos y almacenarlos en una tabla de `DynamoDB`.
 
 - Se despliega una `API Gateway` con dos recursos (`GET /clima` y `GET /clima/{provincia}`) e integrada con otra `Lambda` para que se puedan consultar los datos almacenados en la tabla de `DynamoDB` mediante dicha API.
