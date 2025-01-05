@@ -89,7 +89,7 @@ resource "aws_api_gateway_integration" "clima_provincia_get_integration" {
 }
 
 
-# Se hace el despliegue de la API REST indicando el ID de la API. Se declaran
+# Se crea un despliegue de la API REST indicando el ID de la API. Se declaran
 # dependencias explícitas con las dos integraciones API Gateway - Lambda
 # declaradas en este archivo
 resource "aws_api_gateway_deployment" "clima_api_gateway_deployment" {

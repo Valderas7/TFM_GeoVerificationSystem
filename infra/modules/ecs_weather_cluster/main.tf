@@ -49,11 +49,11 @@ resource "aws_ecs_task_definition" "web_application_task" {
 # el puerto 8501 desde cualquier IP mediante 'TCP'; y el tráfico saliente
 # hacia todas las IPs y puertos mediante todos los protocolos).
 resource "aws_ecs_service" "web_application_service" {
-  name            = var.service_name
-  cluster         = aws_ecs_cluster.web_application_cluster.arn
-  task_definition = "${aws_ecs_task_definition.web_application_task.family}:${aws_ecs_task_definition.web_application_task.revision}"
-  desired_count   = var.instances_number
-  launch_type     = "FARGATE"
+  name                 = var.service_name
+  cluster              = aws_ecs_cluster.web_application_cluster.arn
+  task_definition      = "${aws_ecs_task_definition.web_application_task.family}:${aws_ecs_task_definition.web_application_task.revision}"
+  desired_count        = var.instances_number
+  launch_type          = "FARGATE"
   force_new_deployment = true
 
   network_configuration {
