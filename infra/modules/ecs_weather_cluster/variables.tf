@@ -47,14 +47,14 @@ variable "memory_task" {
 }
 
 
-# Variable para indicar la CPU que va a usar la definición de tarea
+# Variable para indicar la CPU que va a usar el contenedor
 variable "cpu_container" {
   type    = number
   default = 256 # 0.25 vCPU
 }
 
 
-# Variable para indicar la memoria que va a usar la definición de tarea
+# Variable para indicar la memoria que va a usar el contenedor
 variable "memory_container" {
   type    = number
   default = 512 # 512 MB RAM
