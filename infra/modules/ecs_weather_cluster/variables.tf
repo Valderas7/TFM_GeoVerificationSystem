@@ -34,14 +34,28 @@ variable "repo_tag" {
 
 
 # Variable para indicar la CPU que va a usar la definición de tarea
-variable "cpu" {
+variable "cpu_task" {
+  type    = number
+  default = 512 # 0.5 vCPU
+}
+
+
+# Variable para indicar la memoria que va a usar la definición de tarea
+variable "memory_task" {
+  type    = number
+  default = 1024 # 1 GB RAM
+}
+
+
+# Variable para indicar la CPU que va a usar la definición de tarea
+variable "cpu_container" {
   type    = number
   default = 256 # 0.25 vCPU
 }
 
 
 # Variable para indicar la memoria que va a usar la definición de tarea
-variable "memory" {
+variable "memory_container" {
   type    = number
   default = 512 # 512 MB RAM
 }

@@ -18,14 +18,14 @@ resource "aws_ecs_task_definition" "web_application_task" {
   task_role_arn            = var.role_iam
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = var.cpu
-  memory                   = var.memory
+  cpu                      = var.cpu_task
+  memory                   = var.memory_task
   container_definitions = jsonencode([
     {
       name      = var.container_name
       image     = "${var.repo_url}${var.repo_tag}"
-      cpu       = var.cpu
-      memory    = var.memory
+      cpu       = var.cpu_container
+      memory    = var.memory_container
       essential = true
       environment = [
         { name = "update", value = timestamp() }
@@ -49,7 +49,7 @@ resource "aws_ecs_task_definition" "web_application_task" {
 # tarea definidas. Se le asigna una IP pública, el grupo de seguridad y las
 # subredes creadas en el módulo de 'VPC' para realizar la configuración de
 # red del servicio (el grupo de seguridad permite el tráfico entrante solo en
-# el puerto 8501 desde cualquier IP mediante 'TCP'; y el tráfico saliente
+# el puerto 80 desde cualquier IP mediante 'TCP'; y el tráfico saliente
 # hacia todas las IPs y puertos mediante todos los protocolos).
 resource "aws_ecs_service" "web_application_service" {
   name            = var.service_name
