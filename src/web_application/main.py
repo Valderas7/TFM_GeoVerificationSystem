@@ -41,8 +41,8 @@ if action == "Situación meteorológica actual":
                 "el `popup` con toda la información meteorológica actual "
                 "correspondiente a dicha provincia.")
 
-    # Se crea un mapa centrado en Madrid
-    m = leafmap.Map(center=(40.4168, -3.7038), zoom=6)
+    # Se crea un mapa centrado en Madrid sin herramientas de dibujo
+    m = leafmap.Map(center=(40.4168, -3.7038), zoom=6, draw_control=False)
 
     # Se realiza petición GET a la API Gateway en /clima
     response = requests.get(f"{api_gateway_url}/clima").json()
@@ -399,6 +399,11 @@ if action == "Estadísticas":
         # Se crean dos columnas con Streamlit
         col1, col2 = st.columns(2)
 
+        # Se almacenan los valores máximos y mínimos para fijar las dos
+        # gráficas en el mismo Eje Y
+        temp_min = min(data['Temperatura'])
+        temp_max = max(data['Temperatura'])
+
         # Para la columna de la izquierda...
         with col1:
 
@@ -416,10 +421,11 @@ if action == "Estadísticas":
                         palette='Reds_r')
 
             # Se personaliza el diagrama con etiquetas y rotación de las del
-            # Eje X
+            # Eje X. También se establece el límite del Eje Y
             plt.xticks(rotation=90)
             plt.xlabel("Provincias")
             plt.ylabel("Temperatura (°C)")
+            plt.ylim(temp_min - 1, temp_max + 1)
 
             # Se muestra la figura en Streamlit
             st.pyplot(plt, use_container_width=True)
@@ -441,10 +447,11 @@ if action == "Estadísticas":
                         palette='Blues_r')
 
             # Se personaliza el diagrama con etiquetas y rotación de las del
-            # Eje X
+            # Eje X. También se establece el límite del Eje Y
             plt.xticks(rotation=45)
             plt.xlabel("Provincias")
             plt.ylabel("Temperatura (°C)")
+            plt.ylim(temp_min - 1, temp_max + 1)
 
             # Se muestra la figura en Streamlit
             st.pyplot(plt, use_container_width=True)
@@ -509,6 +516,11 @@ if action == "Estadísticas":
         # Se crean dos columnas con Streamlit
         col1, col2 = st.columns(2)
 
+        # Se almacenan los valores máximos y mínimos para fijar las dos
+        # gráficas en el mismo Eje Y
+        humidity_min = min(data['Humedad'])
+        humidity_max = max(data['Humedad'])
+
         # Para la columna de la izquierda...
         with col1:
 
@@ -526,10 +538,11 @@ if action == "Estadísticas":
                         palette='Blues_r')
 
             # Se personaliza el diagrama con etiquetas y rotación de las del
-            # Eje X
+            # Eje X. También se establece el límite del Eje Y
             plt.xticks(rotation=45)
             plt.xlabel("Provincias")
             plt.ylabel("Humedad (%)")
+            plt.ylim(humidity_min - 1, humidity_max + 1)
 
             # Se muestra la figura en Streamlit
             st.pyplot(plt, use_container_width=True)
@@ -551,10 +564,11 @@ if action == "Estadísticas":
                         palette=["#b3cde0"])
 
             # Se personaliza el diagrama con etiquetas y rotación de las del
-            # Eje X
+            # Eje X. También se establece el límite del Eje Y
             plt.xticks(rotation=45)
             plt.xlabel("Provincias")
             plt.ylabel("Humedad (%)")
+            plt.ylim(humidity_min - 1, humidity_max + 1)
 
             # Se muestra la figura en Streamlit
             st.pyplot(plt, use_container_width=True)
