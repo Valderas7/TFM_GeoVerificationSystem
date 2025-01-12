@@ -3,18 +3,21 @@ import requests
 import boto3
 import os
 import json
+import time
 import logging
 from botocore.exceptions import ClientError
 from decimal import Decimal
 from utils.geography_utils import get_provinces_and_autonomous_cities
 from utils.translate_dict_utils import translate_weather_dict
 
-# Configuración básica del 'logging'
-logging.basicConfig(level=logging.INFO)
+# AWS ya tiene un manejador de 'logging' por defecto, por lo que se selecciona
+# y se establece su nivel a INFO
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 # Se inicia cliente de recursos de DynamoDB para gestionar una tabla
 dynamodb_resource = boto3.resource('dynamodb', region_name='us-east-1')
-dynamodb_table = dynamodb_resource.Table("Weather_DB")
+dynamodb_table = dynamodb_resource.Table("weather")
 
 
 # Función Lambda
@@ -25,11 +28,15 @@ def lambda_handler(event: None, context: None):
 
         # Se obtiene el valor de la 'API KEY' pasado como variable de entorno
         api_key = os.getenv('API_KEY')
-        logging.info("API_KEY cargada correctamente.")
+        logger.info("API_KEY cargada correctamente.")
 
         # Se llama a 'get_provinces_and_autonomous_cities' para obtener los
         # nombres de las provincias y ciudades autónomas de España
         spain_provinces_cities_list = get_provinces_and_autonomous_cities()
+
+        # Se obtiene el 'timestamp' numérico en segundos para comprobar
+        # cuando se ejecuta la Lambda
+        timestamp = int(time.time())
 
         # Para cada una de las provincias y ciudades autónomas...
         for province in spain_provinces_cities_list:
@@ -50,16 +57,17 @@ def lambda_handler(event: None, context: None):
 
                 # Se obtiene el JSON de la respuesta para ver los datos
                 data = response.json()
-                logging.info(f"Datos obtenidos para {province}")
+                logger.info(f"Datos obtenidos para {province}.")
 
                 # Se crea el diccionario para insertar en DynamoDB con el ID
-                # de la provincia o ciudad (clave de partición), el nombre,
-                # la situación meteorológica, temperatura, presión, humedad,
-                # viento, nubosidad, y en caso de que las hubiese, lluvias
-                # y nevadas.
-                # Además se almacena la longitud y latitud de cada sitio
+                # de la provincia o ciudad (clave de partición), el
+                # 'timestamp' (clave de ordenación), el nombre, la situación
+                # meteorológica, temperatura, presión, humedad, viento,
+                # nubosidad, y en caso de que las hubiese, lluvias y nevadas.
+                # Además se almacena la longitud y latitud de cada lugar.
                 item = {
                     'Nombre': data["name"],
+                    'Marca_Temporal': timestamp,
                     'Clima': data["weather"][0]["main"],
                     'Temperatura': data["main"]["temp"],
                     'Presion_Atmosferica': data["main"]["pressure"],
@@ -86,71 +94,36 @@ def lambda_handler(event: None, context: None):
                 # Se intenta insertar el diccionario en la tabla de Dynamo
                 try:
 
-                    # Se comprueba si en la tabla ya hay un registro con la
-                    # clave de de partición ('Nombre') de la provincia actual
-                    response = dynamodb_table.get_item(
-                        Key={'Nombre': item["Nombre"]}
+                    # Se añade el diccionario a la tabla de DynamoDB solo si
+                    # la 'Marca_Temporal' no existe previamente para esa
+                    # provincia en concreto (la condición solo se aplica al
+                    # 'timestamp' dentro del contexto de cada provincia
+                    # individual, y no en todas las provincias).
+                    dynamodb_table.put_item(
+                        Item=item,
+                        ConditionExpression=(
+                            'attribute_not_exists(Marca_Temporal)')
                     )
-
-                    # Si no hay un registro en la tabla con esa clave de
-                    # partición...
-                    if 'Item' not in response:
-
-                        # Se añade el diccionario a la tabla de DynamoDB
-                        dynamodb_table.put_item(
-                            Item=item,
-                            ConditionExpression='attribute_not_exists(Nombre)'
-                        )
-
-                    # Si no, ya hay registro con esa clave...
-                    else:
-
-                        # Por tanto, se actualizan los registros con los
-                        # nuevos valores
-                        dynamodb_table.update_item(
-                            Key={'Nombre': item["Nombre"]},
-                            ConditionExpression='attribute_exists(Nombre)',
-                            UpdateExpression=(
-                                "SET Clima = :val1, "
-                                "Temperatura = :val2, "
-                                "Presion_Atmosferica = :val3, "
-                                "Humedad = :val4, "
-                                "Velocidad_Viento = :val5, "
-                                "Nubosidad = :val6, "
-                                "Precipitaciones = :val7, "
-                                "Nevadas = :val8"
-                            ),
-                            ExpressionAttributeValues={
-                                ':val1': item['Clima'],
-                                ':val2': item['Temperatura'],
-                                ':val3': item['Presion_Atmosferica'],
-                                ':val4': item['Humedad'],
-                                ':val5': item['Velocidad_Viento'],
-                                ':val6': item['Nubosidad'],
-                                ':val7': item['Precipitaciones'],
-                                ':val8': item['Nevadas']
-                            }
-                        )
+                    logger.info("Registro insertado en DynamoDB para "
+                                f"{province} con la época {timestamp}.")
 
                 # Si hay alguna excepción con la inserción en DynamoDB
                 except ClientError as e:
 
                     # Mensaje de logging de error
-                    logging.error(
-                        f"Error en DynamoDB con la provincia {province}: "
-                        f"{str(e)}"
+                    logger.error(
+                        f"Error al introducir el registro en DynamoDB para "
+                        f"{province}: {str(e)}"
                     )
 
             # Si hay alguna excepción con la petición a la API...
             except requests.exceptions.RequestException as e:
 
                 # Mensaje de logging de error
-                logging.error(
-                    f"Error en la API para la provincia {province}: {str(e)}"
-                )
+                logger.error(f"Error en la API para {province}: {str(e)}")
 
     # Si no se entra en la función Lambda el error es crítico
     except Exception as e:
 
         # Mensaje de logging de error crítico
-        logging.critical(f"Error crítico en la función Lambda: {str(e)}")
+        logger.critical(f"Error crítico en la función Lambda: {str(e)}")

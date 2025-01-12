@@ -1,7 +1,7 @@
 # Variable para el nombre de la tabla de DynamoDB
 variable "table_name" {
   type    = string
-  default = "Weather_DB"
+  default = "weather"
 }
 
 
@@ -16,4 +16,10 @@ variable "billing_mode" {
 variable "partition_key" {
   type    = string
   default = "Nombre"
+}
+
+# Variable para la clave de ordenación
+variable "sort_key" {
+  type    = string
+  default = "Marca_Temporal"
 }
