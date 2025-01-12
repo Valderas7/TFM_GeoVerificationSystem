@@ -55,9 +55,8 @@ def lambda_handler(event: None, context: None):
                 # Se lanza excepción si la respuesta no es un HTTP 200
                 response.raise_for_status()
 
-                # Se obtiene el JSON de la respuesta para ver los datos
+                # Se obtiene el JSON de la respuesta y se almacena
                 data = response.json()
-                logger.info(f"Datos obtenidos para {province}.")
 
                 # Se crea el diccionario para insertar en DynamoDB con el ID
                 # de la provincia o ciudad (clave de partición), el
@@ -86,6 +85,11 @@ def lambda_handler(event: None, context: None):
                 # valores de la clave 'Clima' a español
                 item = translate_weather_dict(item)
 
+                # Se almacena el nombre actualizado de la provincia para
+                # usarlo simplemente en los mensajes de 'logging'
+                province_updated = item["Nombre"]
+                logger.info(f"Datos obtenidos para {province_updated}.")
+
                 # Se convierte a 'string' el diccionario para convertir los
                 # 'float' a 'Decimal'. Tras esto, se vuelve a convertir el
                 # 'string' de vuelta a un diccionario
@@ -105,7 +109,8 @@ def lambda_handler(event: None, context: None):
                             'attribute_not_exists(Marca_Temporal)')
                     )
                     logger.info("Registro insertado en DynamoDB para "
-                                f"{province} con la época {timestamp}.")
+                                f"{province_updated} con la época "
+                                f"{timestamp}.")
 
                 # Si hay alguna excepción con la inserción en DynamoDB
                 except ClientError as e:
@@ -113,7 +118,7 @@ def lambda_handler(event: None, context: None):
                     # Mensaje de logging de error
                     logger.error(
                         f"Error al introducir el registro en DynamoDB para "
-                        f"{province}: {str(e)}"
+                        f"{province_updated}: {str(e)}"
                     )
 
             # Si hay alguna excepción con la petición a la API...
