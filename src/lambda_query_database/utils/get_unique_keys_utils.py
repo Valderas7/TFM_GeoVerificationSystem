@@ -67,5 +67,5 @@ def translate_province_list(province_list: list) -> list:
 
     # Se obtiene el valor mapeado de 'mapeo_name' para cada provincia de la
     # lista 'province_list'. Si no existe la provincia en 'mapeo_name', se
-    # deja su valor original en la lista 
+    # deja su valor original en la lista
     return [mapeo_name.get(province, province) for province in province_list]

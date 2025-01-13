@@ -61,42 +61,69 @@ def lambda_handler(event, context):
             # acentos, 'ñ' ni espacios
             place = urllib.parse.unquote(place)
 
-            # Se realiza una consulta a la tabla de DynamoDB cuya clave
-            # primaria ('Nombre') es igual a la variable 'place', obteniendo
-            # todos los registros que hay con dicha clave primaria
-            response = dynamo_table.query(
-                KeyConditionExpression="Nombre = :nombre",
-                ExpressionAttributeValues={':nombre': place},
-                ScanIndexForward=False,
-                Limit=12
-            )
+            # Se intenta ejecutar el siguiente bloque de código
+            try:
 
-            # Después de realizar la consulta, se verifica el campo 'Item' del
-            # diccionario obtenido como respuesta a la consulta (debe ser una
-            # lista de diccionarios)
-            item = response.get('Item', None)
+                # Se realiza una consulta a la tabla de DynamoDB cuya clave
+                # primaria ('Nombre') es igual a la variable 'place',
+                # obteniendo los doce registros (12 * 2 = 24h) más recientes
+                # que hay (ordenados por la clave de partición) con dicha
+                # clave primaria
+                response = dynamo_table.query(
+                    KeyConditionExpression="Nombre = :nombre",
+                    ExpressionAttributeValues={':nombre': place},
+                    ScanIndexForward=False,
+                    Limit=12
+                )
 
-            # Si la clave consultada no existe...
-            if not item:
+            # Si no se puede consultar la tabla de DynamoDB...
+            except Exception as e:
 
                 # Mensaje de 'logging' de error
-                logger.error(f"No se encontró la provincia '{place}' en "
-                             "la base de datos.")
+                logger.error(f"Error al consultar DynamoDB: {str(e)}")
 
-                # Se devuelve diccionario de error con un HTTP 404
+                # Se retorna un HTTP 500 con un diccionario indicando
+                # que hay error en el servidor
                 return {
-                    "statusCode": 404,
-                    "body": json.dumps({"error": "Provincia no encontrada"}),
+                    "statusCode": 500,
+                    "body": json.dumps({"error": "Error interno en "
+                                        "DynamoDB"}),
                     "headers": {"Content-Type": "application/json"}
                 }
 
-            # Se devuelve un diccionario con el código de estado HTTP 200 y
-            # el JSON, sin escapar los caracteres no ASCII (tildes, etc)
-            logger.info(f"Provincia '{place}' encontrada en DynamoDB. "
-                         "Retornando datos.")
+            # Después de realizar la consulta, se verifica el campo 'Items'
+            # del diccionario obtenido como respuesta a la consulta (debe ser
+            # una lista de diccionarios)
+            items = response.get('Items', None)
+
+            # Si el campo 'Items' es una lista vacía (en Python las listas
+            # vacías son 'False' en condición booleana) no se han encontrado
+            # registros...
+            if not items:
+
+                # Mensaje de 'logging' de error
+                logger.error(f"No se encontró '{place}' en la base de datos "
+                             "de DynamoDB.")
+
+                # Se retorna un HTTP 404 con un diccionario indicando que hay
+                # un recurso no encontrado
+                return {
+                    "statusCode": 404,
+                    "body": json.dumps({"error": f"Clave primaria '{place}' "
+                                        "no encontrada en DynamoDB"}),
+                    "headers": {"Content-Type": "application/json"}
+                }
+
+            # Mensaje 'logging' de información
+            logger.info(f"Clave de partición '{place}' encontrada en "
+                        "DynamoDB.")
+
+            # Se devuelve un HTTP 200 con la lista de diccionarios, sin
+            # escapar los caracteres no ASCII (tildes, etc) y que se muestren
+            # tal y como son
             return {
                 'statusCode': 200,
-                'body': json.dumps(item, cls=DecimalEncoder,
+                'body': json.dumps(items, cls=DecimalEncoder,
                                    ensure_ascii=False)
             }
 
@@ -152,7 +179,7 @@ def lambda_handler(event, context):
                     # 'recent_items_list'
                     recent_items_list.append(item)
 
-                # Si no...
+                # Si no se encuentra registro tras la consulta...
                 else:
 
                     # Mensaje de 'logging' de error
@@ -176,8 +203,8 @@ def lambda_handler(event, context):
         # Mensaje de 'logging' crítico
         logger.critical(f"Error en la función Lambda: {str(e)}")
 
-        # Se devuelve un HTTP 500 con un diccionario que muestra el error que
-        # ha ocurrido
+        # Se devuelve un HTTP 500 con un diccionario que indica que hay error
+        # en el servidor
         return {
             "statusCode": 500,
             "body": json.dumps({"error": str(e)})
