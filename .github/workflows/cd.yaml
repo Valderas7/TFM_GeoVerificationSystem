@@ -10,7 +10,6 @@ on:
     workflows: ["Integración Continua"]
     types:
       - completed
-    status: success
 
 # Trabajos que se ejecutan en el flujo de trabajo
 jobs:
