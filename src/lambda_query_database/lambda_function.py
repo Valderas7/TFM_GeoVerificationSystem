@@ -4,8 +4,10 @@ import decimal
 import json
 import urllib.parse
 import logging
-from utils.get_unique_keys_utils import (get_provinces_and_autonomous_cities,
-                                         translate_province_list)
+from utils.get_unique_primary_keys import (
+    get_provinces_and_autonomous_cities,
+    translate_province_list
+)
 
 # AWS ya tiene un manejador de 'logging' por defecto, por lo que se selecciona
 # y se establece su nivel a INFO
