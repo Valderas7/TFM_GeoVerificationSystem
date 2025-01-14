@@ -16,26 +16,29 @@ api_gateway_url = 'https://mjb5qk45si.execute-api.us-east-1.amazonaws.com/prod'
 
 # Barra lateral para mostrar las opciones disponibles
 st.sidebar.title("Secciones")
-action = st.sidebar.radio("Elige una opción:",
-                          options=["Situación meteorológica actual",
-                                   "Consultar provincia específica",
-                                   "Estadísticas"])
+action = st.sidebar.radio(label="Elige una sección para seleccionar el tipo "
+                          "de datos a mostrar.",
+                          options=["Mapa Interactivo de Datos "
+                                   "Climáticos en España",
+                                   "Exploración de Datos Climáticos por "
+                                   "Provincia",
+                                   "Estadísticas Generales"])
 
-# Si se elige la opción 'Ver mapa general'
-if action == "Situación meteorológica actual":
+# Si se elige la opción 'Mapa Interactivo de Datos Climáticos en España'
+if action == "Mapa Interactivo de Datos Climáticos en España":
 
     # Título de la Web App con cabecera H2
-    st.markdown("<h2 style='text-align: center; color: black;'> Visualizador "
-                "Interactivo de Datos Climáticos de España </h2>",
+    st.markdown("<h2 style='text-align: center; color: black;'> Mapa "
+                "Interactivo de Información <br> Climática en España </h2>",
                 unsafe_allow_html=True)
 
     # Descripción de lo que realiza la aplicación web
-    st.markdown("Consulta información climática actualizada de cada "
-                "provincia de España de forma visual y dinámica. Este mapa "
-                "interactivo muestra datos como el clima, la temperatura, la "
-                "humedad o las precipitaciones y nevadas (en caso de que las "
-                "hubiera) utilizando marcadores informativos para cada "
-                "ubicación.")
+    st.markdown("En esta sección se muestra información climática actualizada"
+                " de cada provincia de España de forma visual y dinámica. "
+                "Este mapa interactivo muestra datos como el clima, la "
+                "temperatura, la humedad o las precipitaciones (en caso de "
+                "que las hubiera) utilizando marcadores informativos para "
+                "cada ubicación.")
 
     st.markdown("Para ver la información de una provincia basta con "
                 "hacer `click` en cualquier marcador del mapa para mostrar "
@@ -157,27 +160,34 @@ if action == "Situación meteorológica actual":
     # Renderiza el mapa en Streamlit
     m.to_streamlit()
 
-# Si se elige la opción 'Consultar provincia específica'...
-if action == "Consultar provincia específica":
+# Si se elige la opción 'Exploración de Datos Climáticos por Provincia'...
+if action == "Exploración de Datos Climáticos por Provincia":
 
     # Título de la aplicación
     st.markdown(
-        "<h2 style='text-align: center; color: black;'> Consultar Provincia "
-        "Específica </h2>", unsafe_allow_html=True
+        "<h2 style='text-align: center; color: black;'> Exploración de Datos "
+        "Climáticos por Provincia </h2>", unsafe_allow_html=True
     )
 
     # Descripción de lo que realiza la aplicación web
-    st.markdown("Consulta información climática actualizada de una "
-                "provincia específica. Al introducir dicha provincia en el "
-                "cuadro de texto se muestra el `JSON` de respuesta de la "
-                "`API` con todos los datos climáticos además de mostrar en "
-                "el mapa donde está situada dicha provincia.")
+    st.markdown("Esta sección permite visualizar los datos climáticos de las "
+                "últimas `24 horas` de una provincia específica, además de "
+                "mostrar los valores máximos y mínimos alcanzados durante "
+                "dicho periodo. Para ver los datos climáticos de una hora en "
+                "concreto hay que seleccionar en la ventana de selección la "
+                "provincia de interés.")
+    st.markdown("- Una vez seleccionada, se muestra una tabla donde "
+                "aparecen los valores máximos y mínimos durante las últimas "
+                "24 horas.")
+    st.markdown("- Con el `slider` se selecciona la hora dentro del intervalo"
+                " de 24 horas de la cual mostrar los datos climáticos en el "
+                "mapa de `Leafmap`.")
 
     # Se obtiene la lista de provincias y ciudades autónomas; y tras obtenerla
     # se llama a 'translate_province_list' para renombrar correctamente
     # algunas provincias (Ej: Áraba a Álava)
-    provinces_list = translate_province_list(
-        get_provinces_and_autonomous_cities()
+    provinces_list = sorted(
+        translate_province_list(get_provinces_and_autonomous_cities())
     )
 
     # Se introduce un 'widget' de selección de provincia
@@ -207,14 +217,35 @@ if action == "Consultar provincia específica":
                             float(data[0]['Longitud']))
 
                 # Se crea un mapa centrado en los valores de latitud y
-                # longitud de la provincia seleccionada
-                map_provincia = leafmap.Map(center=(lat, lon), zoom=6)
+                # longitud de la provincia seleccionada y sin controles de
+                # dibujo
+                map_provincia = leafmap.Map(center=(lat, lon), zoom=6,
+                                            draw_control=False)
 
                 # Se añade el marcador de la provincia al mapa
                 map_provincia.add_marker(location=(lat, lon))
 
                 # Se convierte la lista de diccionarios a un 'dataframe'
                 province_df = pd.DataFrame(data)
+
+                # Se crea otro 'dataframe' para mostrar los valores máximos y
+                # mínimos de la provincia durante este periodo de 24 horas
+                tabla_max_min = pd.DataFrame({
+                    "Variable": ["Temperatura (°C)", "Humedad (%)",
+                                 "Viento (m/s)", "Nubosidad (%)"],
+                    "Mínimo": [province_df["Temperatura"].astype(float).min(),
+                               province_df["Humedad"].min(),
+                               province_df["Velocidad_Viento"].min(),
+                               province_df["Nubosidad"].min()],
+                    "Máximo": [province_df["Temperatura"].astype(float).max(),
+                               province_df["Humedad"].max(),
+                               province_df["Velocidad_Viento"].max(),
+                               province_df["Nubosidad"].max()]
+                    }
+                )
+
+                # Se muestra el 'dataframe' en Streamlit
+                st.dataframe(tabla_max_min, use_container_width=True)
 
                 # Se convierte el tiempo Unix a formato 'datetime64' de pandas
                 # (YYYY-MM-DD HH:mm:ss) indicando que la época está indicada
@@ -229,6 +260,9 @@ if action == "Consultar provincia específica":
                 # Python para poder usarlos en el 'slider' de Streamlit
                 min_fecha = province_df["Fecha"].min().to_pydatetime()
                 max_fecha = province_df["Fecha"].max().to_pydatetime()
+
+                # Para crear espacio
+                st.text("")
 
                 # Se crea un 'slider' de Streamlit para seleccionar los datos
                 # de una de las horas entre 'min_fecha' y 'max_fecha' en pasos
@@ -253,25 +287,62 @@ if action == "Consultar provincia específica":
                 # seleccionadas en el 'slider'...
                 if not datos_fecha.empty:
 
-                    # Se selecciona la fila del 'dataframe'
+                    # Se selecciona la fila del 'dataframe' (será una serie de
+                    # 'pandas')
                     fila = datos_fecha.iloc[0]
 
-                    # Se crea un 'popup' para añadir al mapa de Streamlit
-                    popup_info = (
-                        f"<b>Clima:</b> {fila['Clima']}<br>"
-                        f"<b>Temperatura:</b> {fila['Temperatura']}°C<br>"
+                    # Se crea un texto para añadir a un 'popup' del mapa
+                    popup_text = (
+                        f"<b>Clima:</b> "
+                        f"{convert_to_html_entities(fila['Clima'])}<br>"
+                        f"<b>Temperatura:</b> "
+                        f"{fila['Temperatura']} &#176;C<br>"
                         f"<b>Humedad:</b> {fila['Humedad']}%<br>"
-                        f"<b>Velocidad del Viento:</b> {fila['Velocidad_Viento']} m/s<br>"
-                        f"<b>Nubosidad:</b> {fila['Nubosidad']}%"
+                        f"<b>Viento:</b> {fila['Velocidad_Viento']} m/s<br>"
+                        f"<b>Nubosidad:</b> {fila['Nubosidad']}%<br>"
                     )
+
+                    # Si las precipitaciones de la serie de 'pandas' son
+                    # mayores de 0 mm/h...
+                    if float(fila['Precipitaciones']) > 0.0:
+
+                        # Se agregan las precipitaciones al 'popup'
+                        popup_text += (
+                            f"<b>Precipitaciones:</b> "
+                            f"{fila['Precipitaciones']} mm/h<br>"
+                        )
+
+                    # Si las nevadas de la serie de 'pandas' son mayores de
+                    # 0 mm/h...
+                    if float(fila['Nevadas']) > 0.0:
+
+                        # Se agregan las nevadas al 'popup'
+                        popup_text += (
+                            f"<b>Nevadas:</b> {fila['Nevadas']} mm/h<br>"
+                        )
+
+                    # Se crea un 'popup' con el contenido y se especifica su
+                    # ancho máximo
+                    popup = folium.Popup(popup_text, max_width=400,
+                                         sticky=False, show=True)
 
                     # Se añade un marcador en el mapa de 'Streamlit' en la
                     # localización de la provincia con la información del
                     # 'popup'
                     map_provincia.add_marker(
                         location=(fila['Latitud'], fila['Longitud']),
-                        popup=popup_info
+                        popup=popup
                     )
+
+                # Si no hay datos para la hora seleccionada...
+                else:
+
+                    # Mensaje de error en Streamlit
+                    st.error(f"No se encontraron datos para {provincia} a "
+                             "la hora especificada.")
+
+                # Para crear espacio entre el 'slider' y el mapa
+                st.text("")
 
                 # Se renderiza el mapa de 'Leafmap' en Streamlit
                 map_provincia.to_streamlit()
@@ -279,22 +350,25 @@ if action == "Consultar provincia específica":
             # Si la respuesta JSON no existe...
             else:
 
-                # Mensaje de 'warning' en Streamlit
-                st.warning(
-                    "No se encontraron datos para la provincia especificada."
+                # Mensaje de error en Streamlit
+                st.error(
+                    f"No se encontraron datos para {provincia}."
                 )
 
         # Si la respuesta de la solicitud GET no es satisfactoria...
         else:
 
             # Mensaje de error en Streamlit
-            st.error(
-                "Error al obtener los datos. Verifica el nombre de la "
-                "provincia."
-            )
+            st.error("Error al obtener los datos de la API.")
+
+    # Si no...
+    else:
+
+        # No se hace nada
+        pass
 
 # Si se elige la opción 'Estadísticas'...
-if action == "Estadísticas":
+if action == "Estadísticas Generales":
 
     # Título de la aplicación
     st.markdown(
