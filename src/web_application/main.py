@@ -1,5 +1,6 @@
 # Librerías
 import streamlit as st
+import datetime
 import pandas as pd
 import requests
 import leafmap.foliumap as leafmap
@@ -115,15 +116,17 @@ if action == "Situación meteorológica actual":
         # las 'ñ' y las tildes por sus códigos numéricos HTML con la
         # función 'convert_to_html_entities'
         popup_content = (
-            f"Provincia: "
+            f"<b>Provincia:</b> "
             f"{convert_to_html_entities(provincia_dict['Nombre'])}<br>"
-            f"Clima: {convert_to_html_entities(provincia_dict['Clima'])}<br>"
-            f"Temperatura: {provincia_dict['Temperatura']} &#176;C<br>"
-            f"Humedad: {provincia_dict['Humedad']} %<br>"
-            f"Nubosidad: {provincia_dict['Nubosidad']} %<br>"
-            f"{convert_to_html_entities('Presión Atm')}: "
+            f"<b>Clima:</b> "
+            f"{convert_to_html_entities(provincia_dict['Clima'])}<br>"
+            f"<b>Temperatura:</b> "
+            f"{provincia_dict['Temperatura']} &#176;C<br>"
+            f"<b>Humedad:</b> {provincia_dict['Humedad']} %<br>"
+            f"<b>Nubosidad:</b> {provincia_dict['Nubosidad']} %<br>"
+            f"<b>{convert_to_html_entities('Presión Atmosférica')}:</b> "
             f"{provincia_dict['Presion_Atmosferica']} hPa<br>"
-            f"Viento: {provincia_dict['Velocidad_Viento']} m/s<br>"
+            f"<b>Viento:</b> {provincia_dict['Velocidad_Viento']} m/s<br>"
         )
 
         # Si las precipitaciones del diccionario son mayores de 0 mm/h...
@@ -131,7 +134,7 @@ if action == "Situación meteorológica actual":
 
             # Se agregan las precipitaciones al 'popup'
             popup_content += (
-                f"Precipitaciones: "
+                f"<b>Precipitaciones:</b> "
                 f"{provincia_dict['Precipitaciones']} mm/h<br>"
             )
 
@@ -140,7 +143,7 @@ if action == "Situación meteorológica actual":
 
             # Se agregan las nevadas al 'popup'
             popup_content += (
-                f"Nevadas: "
+                f"<b>Nevadas:</b> "
                 f"{provincia_dict['Nevadas']} mm/h<br>"
             )
 
@@ -198,21 +201,79 @@ if action == "Consultar provincia específica":
             # Si la respuesta JSON existe...
             if data:
 
-                # Se muestra el JSON de la respuesta en la aplicación web
-                st.json(data)
-
                 # Se recopilan los valores de latitud y longitud de la
-                # provincia
-                lat, lon = float(data['Latitud']), float(data['Longitud'])
+                # provincia de cualquier diccionario de la lista
+                lat, lon = (float(data[0]['Latitud']),
+                            float(data[0]['Longitud']))
 
                 # Se crea un mapa centrado en los valores de latitud y
-                # longitud de la provincia
+                # longitud de la provincia seleccionada
                 map_provincia = leafmap.Map(center=(lat, lon), zoom=6)
 
                 # Se añade el marcador de la provincia al mapa
                 map_provincia.add_marker(location=(lat, lon))
 
-                # Se renderiza el mapa en Streamlit
+                # Se convierte la lista de diccionarios a un 'dataframe'
+                province_df = pd.DataFrame(data)
+
+                # Se convierte el tiempo Unix a formato 'datetime64' de pandas
+                # (YYYY-MM-DD HH:mm:ss) indicando que la época está indicada
+                # en segundos
+                province_df["Fecha"] = pd.to_datetime(
+                    province_df["Marca_Temporal"],
+                    unit="s"
+                )
+
+                # Se busca el 'datetime' de 'pandas' más lejano y el más
+                # reciente y se convierten a objetos 'datetime' estándar de
+                # Python para poder usarlos en el 'slider' de Streamlit
+                min_fecha = province_df["Fecha"].min().to_pydatetime()
+                max_fecha = province_df["Fecha"].max().to_pydatetime()
+
+                # Se crea un 'slider' de Streamlit para seleccionar los datos
+                # de una de las horas entre 'min_fecha' y 'max_fecha' en pasos
+                # de dos horas
+                fecha_seleccionada = st.slider(
+                    "Selecciona una hora:",
+                    min_value=min_fecha,
+                    max_value=max_fecha,
+                    value=min_fecha,
+                    format="DD-MM-YYYY HH:mm",
+                    step=datetime.timedelta(hours=2)
+                )
+
+                # Filtrar datos del 'dataframe' para seleccionar los de la
+                # fecha y hora seleccionadas en el 'slider'
+                datos_fecha = (
+                    province_df.loc[
+                        province_df['Fecha'] == fecha_seleccionada]
+                )
+
+                # Si existen datos en el 'dataframe' para la fecha y hora
+                # seleccionadas en el 'slider'...
+                if not datos_fecha.empty:
+
+                    # Se selecciona la fila del 'dataframe'
+                    fila = datos_fecha.iloc[0]
+
+                    # Se crea un 'popup' para añadir al mapa de Streamlit
+                    popup_info = (
+                        f"<b>Clima:</b> {fila['Clima']}<br>"
+                        f"<b>Temperatura:</b> {fila['Temperatura']}°C<br>"
+                        f"<b>Humedad:</b> {fila['Humedad']}%<br>"
+                        f"<b>Velocidad del Viento:</b> {fila['Velocidad_Viento']} m/s<br>"
+                        f"<b>Nubosidad:</b> {fila['Nubosidad']}%"
+                    )
+
+                    # Se añade un marcador en el mapa de 'Streamlit' en la
+                    # localización de la provincia con la información del
+                    # 'popup'
+                    map_provincia.add_marker(
+                        location=(fila['Latitud'], fila['Longitud']),
+                        popup=popup_info
+                    )
+
+                # Se renderiza el mapa de 'Leafmap' en Streamlit
                 map_provincia.to_streamlit()
 
             # Si la respuesta JSON no existe...
@@ -319,12 +380,19 @@ if action == "Estadísticas":
             pd.DataFrame(promedios).reset_index()
             .rename(columns={"index": "Dato", 0: "Promedio"}))
 
-        # Se almacena un diccionario para añadir las unidades a los promedios
+        # Se cambian dos valores de la columna 'Dato'
+        promedios_df['Dato'] = promedios_df['Dato'].replace(
+            {'Velocidad_Viento': 'Viento',
+             'Presion_Atmosferica': 'Presión'}
+        )
+
+        # Se almacena un diccionario para añadir las unidades a la columna
+        # 'Promedio' del 'dataframe'
         unidades = {
             'Temperatura': 'ºC',
             'Humedad': '%',
-            'Velocidad_Viento': 'm/s',
-            'Presion_Atmosferica': 'hPa',
+            'Viento': 'm/s',
+            'Presión': 'hPa',
             'Nubosidad': '%',
             'Precipitaciones': 'mm/h',
             'Nevadas': 'mm/h'
@@ -338,7 +406,7 @@ if action == "Estadísticas":
         # Se convierte el dataframe a HTML
         html_table = promedios_df.to_html(index=False)
 
-        # Se centra el dataframe con HTML usando CSS
+        # Se centra el dataframe con HTML
         st.markdown(f'<div style="display: flex; justify-content: '
                     f'center;">{html_table}</div>', unsafe_allow_html=True)
 
