@@ -234,13 +234,13 @@ if action == "Exploración de Datos Climáticos por Provincia":
                     "Variable": ["Temperatura (°C)", "Humedad (%)",
                                  "Viento (m/s)", "Nubosidad (%)"],
                     "Mínimo": [province_df["Temperatura"].astype(float).min(),
-                               province_df["Humedad"].min(),
-                               province_df["Velocidad_Viento"].min(),
-                               province_df["Nubosidad"].min()],
+                               province_df["Humedad"].astype(float).min(),
+                               province_df["Velocidad_Viento"].astype(float).min(),
+                               province_df["Nubosidad"].astype(float).min()],
                     "Máximo": [province_df["Temperatura"].astype(float).max(),
-                               province_df["Humedad"].max(),
-                               province_df["Velocidad_Viento"].max(),
-                               province_df["Nubosidad"].max()]
+                               province_df["Humedad"].astype(float).max(),
+                               province_df["Velocidad_Viento"].astype(float).max(),
+                               province_df["Nubosidad"].astype(float).max()]
                     }
                 )
 
@@ -249,11 +249,13 @@ if action == "Exploración de Datos Climáticos por Provincia":
 
                 # Se convierte el tiempo Unix a formato 'datetime64' de pandas
                 # (YYYY-MM-DD HH:mm:ss) indicando que la época está indicada
-                # en segundos
+                # en segundos. Además, se redondea los valores al minuto más
+                # cercano, truncando los segundos a '00' (para que no haya
+                # problemas a la hora de filtrar datos por fecha)
                 province_df["Fecha"] = pd.to_datetime(
                     province_df["Marca_Temporal"],
                     unit="s"
-                )
+                ).dt.floor("min")
 
                 # Se busca el 'datetime' de 'pandas' más lejano y el más
                 # reciente y se convierten a objetos 'datetime' estándar de
