@@ -231,17 +231,22 @@ if action == "Exploración de Datos Climáticos por Provincia":
                 # Se crea otro 'dataframe' para mostrar los valores máximos y
                 # mínimos de la provincia durante este periodo de 24 horas
                 tabla_max_min = pd.DataFrame({
-                    "Variable": ["Temperatura (°C)", "Humedad (%)",
-                                 "Viento (m/s)", "Nubosidad (%)"],
-                    "Mínimo": [province_df["Temperatura"].astype(float).min(),
-                               province_df["Humedad"].astype(float).min(),
-                               province_df["Velocidad_Viento"].astype(float).min(),
-                               province_df["Nubosidad"].astype(float).min()],
-                    "Máximo": [province_df["Temperatura"].astype(float).max(),
-                               province_df["Humedad"].astype(float).max(),
-                               province_df["Velocidad_Viento"].astype(float).max(),
-                               province_df["Nubosidad"].astype(float).max()]
-                    }
+                    "Variable": [
+                        "Temperatura (°C)", "Humedad (%)", "Viento (m/s)",
+                        "Nubosidad (%)"
+                    ],
+                    "Mínimo": [
+                        province_df["Temperatura"].astype(float).min(),
+                        province_df["Humedad"].astype(float).min(),
+                        province_df["Velocidad_Viento"].astype(float).min(),
+                        province_df["Nubosidad"].astype(float).min()
+                    ],
+                    "Máximo": [
+                        province_df["Temperatura"].astype(float).max(),
+                        province_df["Humedad"].astype(float).max(),
+                        province_df["Velocidad_Viento"].astype(float).max(),
+                        province_df["Nubosidad"].astype(float).max()
+                    ]}
                 )
 
                 # Se muestra el 'dataframe' en Streamlit
