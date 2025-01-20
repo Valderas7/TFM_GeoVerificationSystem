@@ -61,7 +61,7 @@ variable "memory_container" {
 }
 
 
-# Variable para el puerto del contenedor
+# Variable para el nombre del contenedor
 variable "container_name" {
   type    = string
   default = "weather_web_application_container"
