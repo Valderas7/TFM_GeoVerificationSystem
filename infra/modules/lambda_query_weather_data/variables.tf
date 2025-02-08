@@ -15,7 +15,7 @@ variable "concurrency_lamba" {
 # Variable para almacenar el ARN para el rol de la Lambda ('LabRole')
 variable "role_lambda" {
   type    = string
-  default = "arn:aws:iam::637423493436:role/LabRole"
+  default = "arn:aws:iam::880383763236:role/LabRole"
 }
 
 
