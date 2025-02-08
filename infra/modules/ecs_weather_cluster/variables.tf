@@ -14,7 +14,7 @@ variable "task_definition_name" {
 # Variable para almacenar el ARN para el rol de la tarea de ECS
 variable "role_iam" {
   type    = string
-  default = "arn:aws:iam::637423493436:role/LabRole"
+  default = "arn:aws:iam::880383763236:role/LabRole"
 }
 
 
