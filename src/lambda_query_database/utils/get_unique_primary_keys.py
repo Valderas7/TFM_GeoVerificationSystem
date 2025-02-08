@@ -26,7 +26,7 @@ def get_provinces_and_autonomous_cities() -> list:
     # Se eliminan los paréntesis y su contenido en cada uno de los nombres,
     # además de los "*"
     spain_provinces_and_cities_names = [
-        re.sub(pattern=r'\[[^\]]*\]', repl='', string=name)  # r'\[.*?\]'
+        re.sub(pattern=r'\[[^\]]*\]', repl='', string=name)
         .replace("*", "").strip()
         for name in spain_provinces_and_cities_names
     ]
