@@ -53,7 +53,10 @@ jobs:
     # de ECR, guardando el plan en un archivo llamado 'tfplan' 
     - name: Plan de Terraform (solo ECR)
       working-directory: ./infra
-      run: terraform plan -out=tfplan -target=module.ecr_weather_repo.aws_ecr_repository.weather_repo
+      run: |
+        terraform plan -out=tfplan \
+          -target=module.ecr_weather_repo.aws_ecr_repository.weather_repo \
+          -var "openweather_api_key=${{ secrets.API_KEY }}"
 
     # Paso 6: Se aprovisiona solamente el recurso de ECR
     - name: Aplicar Terraform (solo ECR)

@@ -236,8 +236,8 @@ if action == "Exploración de Datos Climáticos por Provincia":
                 # mínimos de la provincia durante este periodo de 24 horas
                 tabla_max_min = pd.DataFrame({
                     "Variable": [
-                        temp_name_constant, humidity_name_constant, "Viento (m/s)",
-                        "Nubosidad (%)"
+                        temp_name_constant, humidity_name_constant,
+                        "Viento (m/s)", "Nubosidad (%)"
                     ],
                     "Mínimo": [
                         province_df["Temperatura"].astype(float).min(),
