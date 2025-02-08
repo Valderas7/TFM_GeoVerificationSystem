@@ -14,11 +14,60 @@ on:
 # Trabajos que se ejecutan en el flujo de trabajo
 jobs:
 
-  # Nombre del trabajo nº1: Build_Push_Imagen_Docker
+  # Nombre del trabajo nº1
+  Deploy_ECR:
+
+    # Se ejecuta en una máquina con Ubuntu
+    runs-on: ubuntu-24.04
+
+    # Lista de pasos del 'job'
+    steps:
+
+    # Paso 1: Checkout del repositorio para tenerlo en local en la
+    # máquina de Ubuntu
+    - name: Checkout del repositorio
+      uses: actions/checkout@v3
+
+    # Paso 2: Configurar credenciales de AWS
+    - name: Configurar credenciales de AWS
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: us-east-1
+
+    # Paso 3: Instalar Terraform v1.9.8
+    - name: Instalar Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.9.8
+
+    # Paso 4: Inicializar Terraform en el directorio 'infra' (donde están los
+    # archivos de Terraform en el repositorio)
+    - name: Inicializar Terraform
+      working-directory: ./infra
+      run: terraform init
+
+    # Paso 5: Se genera el plan de ejecución de Terraform solo para el recurso
+    # de ECR, guardando el plan en un archivo llamado 'tfplan' 
+    - name: Plan de Terraform (solo ECR)
+      working-directory: ./infra
+      run: terraform plan -out=tfplan -target=module.ecr_weather_repo.aws_ecr_repository.weather_repo
+
+    # Paso 6: Se aprovisiona solamente el recurso de ECR
+    - name: Aplicar Terraform (solo ECR)
+      working-directory: ./infra
+      run: terraform apply -auto-approve tfplan
+
+  # Nombre del trabajo nº2
   Build_Push_Imagen_Docker:
 
     # Se ejecuta en una máquina con Ubuntu
     runs-on: ubuntu-24.04
+
+    # El trabajo se ejecuta solo cuando termine el trabajo nº1
+    needs: Deploy_ECR
 
     # Lista de pasos del trabajo
     steps:
@@ -83,7 +132,7 @@ jobs:
       if: env.run_build == 'true'
       run: docker push ${{ secrets.ACCOUNT_AWS_ID }}.dkr.ecr.us-east-1.amazonaws.com/weather_web_application:1.0
 
-  # Nombre del trabajo nº2: Despliegue_Terraform
+  # Nombre del trabajo nº3
   Despliegue_Terraform:
 
     # Se ejecuta en una máquina con Ubuntu

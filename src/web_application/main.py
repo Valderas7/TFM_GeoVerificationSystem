@@ -11,6 +11,10 @@ from utils.html_entities import convert_to_html_entities
 from utils.geography_utils import (get_provinces_and_autonomous_cities,
                                    translate_province_list)
 
+# Se definen constantes a usar
+temp_name_constant = "Temperatura (°C)"
+humidity_name_constant = "Humedad (%)"
+
 # Se guarda en una variable la URL de la API Gateway desplegada con AWS
 api_gateway_url = 'https://mjb5qk45si.execute-api.us-east-1.amazonaws.com/prod'
 
@@ -232,7 +236,7 @@ if action == "Exploración de Datos Climáticos por Provincia":
                 # mínimos de la provincia durante este periodo de 24 horas
                 tabla_max_min = pd.DataFrame({
                     "Variable": [
-                        "Temperatura (°C)", "Humedad (%)", "Viento (m/s)",
+                        temp_name_constant, humidity_name_constant, "Viento (m/s)",
                         "Nubosidad (%)"
                     ],
                     "Mínimo": [
@@ -525,7 +529,7 @@ if action == "Estadísticas Generales":
         # en el Eje X y en el Eje Y
         plt.xticks(rotation=90)
         plt.xlabel("Provincias", labelpad=12)
-        plt.ylabel("Temperatura (°C)", labelpad=12)
+        plt.ylabel(temp_name_constant, labelpad=12)
 
         # Se muestra el gráfico de seaborn en Streamlit
         st.pyplot(figure, use_container_width=True)
@@ -573,7 +577,7 @@ if action == "Estadísticas Generales":
             # Eje X. También se establece el límite del Eje Y
             plt.xticks(rotation=90)
             plt.xlabel("Provincias")
-            plt.ylabel("Temperatura (°C)")
+            plt.ylabel(temp_name_constant)
             plt.ylim(temp_min - 1, temp_max + 1)
 
             # Se muestra la figura en Streamlit
@@ -599,7 +603,7 @@ if action == "Estadísticas Generales":
             # Eje X. También se establece el límite del Eje Y
             plt.xticks(rotation=45)
             plt.xlabel("Provincias")
-            plt.ylabel("Temperatura (°C)")
+            plt.ylabel(temp_name_constant)
             plt.ylim(temp_min - 1, temp_max + 1)
 
             # Se muestra la figura en Streamlit
@@ -642,7 +646,7 @@ if action == "Estadísticas Generales":
         # en el Eje X y en el Eje Y
         plt.xticks(rotation=90)
         plt.xlabel("Provincias", fontsize=12)
-        plt.ylabel("Humedad (%)", fontsize=12)
+        plt.ylabel(humidity_name_constant, fontsize=12)
 
         # Se muestra el gráfico de seaborn en Streamlit
         st.pyplot(figure, use_container_width=True)
@@ -690,7 +694,7 @@ if action == "Estadísticas Generales":
             # Eje X. También se establece el límite del Eje Y
             plt.xticks(rotation=45)
             plt.xlabel("Provincias")
-            plt.ylabel("Humedad (%)")
+            plt.ylabel(humidity_name_constant)
             plt.ylim(humidity_min - 1, humidity_max + 1)
 
             # Se muestra la figura en Streamlit
