@@ -1,4 +1,4 @@
-# Imagen base de Python
+# Imagen base de Python Slim
 FROM python:3.11-slim
 
 # Directorio dentro de la imagen en el que se está trabajando
