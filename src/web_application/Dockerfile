@@ -24,9 +24,6 @@ RUN apt-get update && pip install --no-cache-dir leafmap==0.40.1 \
 # Se expone el puerto 80 ya que será en éste donde se servirá la aplicación
 EXPOSE 80
 
-# Comprobación de funcionamiento en el localhost de la imagen en el puerto 80
-HEALTHCHECK CMD ["curl", "--fail", "http://localhost:80/_stcore/health"]
-
 # Se ejecuta la APP de streamlit con el código copiado en la imagen
 # especificando la IP (127.0.0.1) y el puerto (80) donde se servirá
 ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=80", "--server.address=0.0.0.0"]

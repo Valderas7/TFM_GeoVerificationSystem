@@ -16,7 +16,7 @@ temp_name_constant = "Temperatura (°C)"
 humidity_name_constant = "Humedad (%)"
 
 # Se guarda en una variable la URL de la API Gateway desplegada con AWS
-api_gateway_url = 'https://mjb5qk45si.execute-api.us-east-1.amazonaws.com/prod'
+api_gateway_url = 'https://ja54657yuc.execute-api.us-east-1.amazonaws.com/prod'
 
 # Barra lateral para mostrar las opciones disponibles
 st.sidebar.title("Secciones")
@@ -52,8 +52,20 @@ if action == "Mapa Interactivo de Datos Climáticos en España":
     # Se crea un mapa centrado en Madrid sin herramientas de dibujo
     m = leafmap.Map(center=(40.4168, -3.7038), zoom=6, draw_control=False)
 
-    # Se realiza petición GET a la API Gateway en /clima
-    response = requests.get(f"{api_gateway_url}/clima").json()
+    # Se intenta consultar la API Gateway
+    try:
+
+        # Se realiza petición GET a la API Gateway en /clima
+        response = requests.get(f"{api_gateway_url}/clima").json()
+
+    # Si hay excepción con la solicitud a la API...
+    except requests.RequestException:
+
+        # Se indica un mensaje de error de Streamlit
+        st.error("No se pudo conectar con la API. Intentalo más tarde.")
+
+        # Se para la aplicación
+        st.stop()
 
     # Se veritica si la clave 'data' está en la respuesta JSON...
     if 'data' in response:
